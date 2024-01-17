@@ -1,0 +1,30 @@
+{
+  "name": "galilei-web-services",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "pnpm run \"/dev:.*/\"",
+    "dev:web": "pnpm -r run dev",
+    "dev:api": "cargo watch -w ./api/ -x \"run -p api\"",
+    "build": "pnpm run \"/build:.*/\"",
+    "build:web": "pnpm -r run build",
+    "build:api": "cargo build",
+    "lint": "pnpm run \"/lint:.*/\"",
+    "lint:web": "pnpm -r run lint",
+    "lint:api": "cargo check --workspace",
+    "format": "pnpm run \"/format:.*/\"",
+    "format:web": "prettier -w .",
+    "format:api": "cargo fmt --all",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "prettier": "^3.2.2",
+    "prettier-plugin-astro": "^0.12.3",
+    "prettier-plugin-tailwindcss": "^0.5.11"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@8.14.0"
+}

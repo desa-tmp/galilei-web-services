@@ -1,0 +1,6 @@
+{
+  "eslint.workingDirectories": ["web"],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
+}
