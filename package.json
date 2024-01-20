@@ -12,13 +12,30 @@
     "lint": "pnpm run \"/lint:.*/\"",
     "lint:web": "pnpm -r run lint",
     "lint:api": "cargo check --workspace",
-    "format": "pnpm run \"/format:.*/\"",
-    "format:web": "prettier -w .",
-    "format:api": "cargo fmt --all",
+    "fmt": "pnpm run \"/fmt:.*/\"",
+    "fmt:web": "prettier --cache -w .",
+    "fmt:api": "cargo fmt --all",
+    "fmt:toml": "taplo format",
     "prepare": "husky install"
   },
+  "lint-staged": {
+    "web/**/*.{ts,tsx,astro}": [
+      "pnpm --filter web run lint",
+      "prettier --cache --write"
+    ],
+    "api/**/*.rs": [
+      "cargo check",
+      "cargo fmt --"
+    ],
+    "*.toml": [
+      "taplo format"
+    ],
+    "*": "prettier --cache --write --ignore-unknown"
+  },
   "devDependencies": {
+    "@taplo/cli": "^0.5.2",
     "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
     "prettier": "^3.2.2",
     "prettier-plugin-astro": "^0.12.3",
     "prettier-plugin-tailwindcss": "^0.5.11"

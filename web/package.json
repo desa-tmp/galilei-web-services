@@ -8,8 +8,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "lint": "eslint . --cache --max-warnings 0",
-    "lint:fix": "pnpm lint --fix"
+    "lint": "eslint . --cache --max-warnings 0 --fix"
   },
   "dependencies": {
     "@astrojs/react": "^3.0.9",
