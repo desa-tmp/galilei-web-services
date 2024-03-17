@@ -1,29 +1,7 @@
 {
   "extends": [
-    "plugin:astro/recommended",
-    "plugin:@typescript-eslint/strict",
-    "plugin:@typescript-eslint/stylistic-type-checked",
+    "next/core-web-vitals",
     "plugin:tailwindcss/recommended",
     "prettier"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "extraFileExtensions": [".astro"] // This is a required setting in `@typescript-eslint/parser` v5.
-  },
-  "rules": {
-    "tailwindcss/no-custom-classname": "off"
-  },
-  "overrides": [
-    {
-      "files": ["*.astro"],
-      "parser": "astro-eslint-parser",
-      "parserOptions": {
-        "parser": "@typescript-eslint/parser",
-        "extraFileExtensions": [".astro"]
-      },
-      "rules": {}
-    }
-    // ...
   ]
 }

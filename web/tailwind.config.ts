@@ -1,9 +1,13 @@
 import type { Config } from "tailwindcss";
-import animatePlugin from "tailwindcss-animate";
 
 const config = {
   darkMode: ["class"],
-  content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -70,7 +74,7 @@ const config = {
       },
     },
   },
-  plugins: [animatePlugin],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;
 
 export default config;
