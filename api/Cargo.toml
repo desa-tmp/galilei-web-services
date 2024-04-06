@@ -3,8 +3,13 @@ name = "api"
 version = "0.1.0"
 edition = "2021"
 
+default-run = "api"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 serde = { version = "1.0.195", features = ["derive"] }
 actix-web = "4.4.1"
+kube = { version = "0.88.1", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.21.0", features = ["latest"] }
+utoipa = { version = "4.2.0", features = ["actix_extras", "uuid"] }
+uuid = { version = "1.8.0", features = ["serde"] }

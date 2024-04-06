@@ -1,0 +1,673 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "api",
+    "description": "",
+    "license": {
+      "name": ""
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/galaxies": {
+      "get": {
+        "tags": [
+          "galaxy"
+        ],
+        "operationId": "list_all_galaxies",
+        "responses": {
+          "200": {
+            "description": "all user galaxies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Galaxy"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "galaxy"
+        ],
+        "operationId": "create_galaxy",
+        "requestBody": {
+          "description": "data for creating the galaxy",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGalaxyData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "galaxy successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Galaxy"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galaxies/{galaxy_id}": {
+      "put": {
+        "tags": [
+          "galaxy"
+        ],
+        "operationId": "update_galaxy",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for updating the galaxy",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGalaxyData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "galaxy successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Galaxy"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "galaxy"
+        ],
+        "operationId": "delete_galaxy",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of galaxy to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "galaxy successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Galaxy"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galaxies/{galaxy_id}/planets": {
+      "get": {
+        "tags": [
+          "planet"
+        ],
+        "operationId": "list_all_planets",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where planets are contained",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "all planets in the galaxy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Planet"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "planet"
+        ],
+        "operationId": "create_planet",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where the planet will created",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for creating the planet",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlanetData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "planet successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Planet"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galaxies/{galaxy_id}/planets/{planet_id}": {
+      "put": {
+        "tags": [
+          "planet"
+        ],
+        "operationId": "update_planet",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where the planet is contained",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "planet_id",
+            "in": "path",
+            "description": "id of the planet to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for updating the planet",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlanetData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "planet successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Planet"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "planet"
+        ],
+        "operationId": "delete_planet",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where the planet is contained",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "planet_id",
+            "in": "path",
+            "description": "id of the planet to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "planet successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Planet"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galaxies/{galaxy_id}/stars": {
+      "get": {
+        "tags": [
+          "star"
+        ],
+        "operationId": "list_all_stars",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where stars are contained",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "all stars in the galaxy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Star"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "star"
+        ],
+        "operationId": "create_star",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where the star will created",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for creating the star",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStarData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "star successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Star"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/galaxies/{galaxy_id}/stars/{star_id}": {
+      "put": {
+        "tags": [
+          "star"
+        ],
+        "operationId": "update_star",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where the star is contained",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "description": "id of the star to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for updating the star",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStarData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "star successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Star"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "star"
+        ],
+        "operationId": "delete_star",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "description": "id of the galaxy where the star is contained",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "description": "id of the star to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "star successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Star"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConnectPlanetToStar": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "CreateGalaxyData": {
+        "type": "object",
+        "required": [
+          "name",
+          "description"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "CreatePlanetData": {
+        "type": "object",
+        "required": [
+          "name",
+          "capacity"
+        ],
+        "properties": {
+          "capacity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "star_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "CreateStarData": {
+        "type": "object",
+        "required": [
+          "name",
+          "nebula"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "nebula": {
+            "type": "string"
+          }
+        }
+      },
+      "Galaxy": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "user_id"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Planet": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "capacity",
+          "galaxy_id"
+        ],
+        "properties": {
+          "capacity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "galaxy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "star_id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "Star": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "nebula",
+          "galaxy_id"
+        ],
+        "properties": {
+          "galaxy_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nebula": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateGalaxyData": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdatePlanetData": {
+        "type": "object",
+        "properties": {
+          "capacity": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "minimum": 0
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "star": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConnectPlanetToStar"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "UpdateStarData": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "nebula": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}
