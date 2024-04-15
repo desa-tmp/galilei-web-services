@@ -1,33 +1,53 @@
-use crate::endpoints::{galaxy, planet, star};
+use crate::{error, models, routes};
 use utoipa::OpenApi;
 
 #[derive(OpenApi)]
 #[openapi(
   paths(
-    galaxy::list_all_galaxies,
-    galaxy::create_galaxy,
-    galaxy::update_galaxy,
-    galaxy::delete_galaxy,
-    star::list_all_stars,
-    star::create_star,
-    star::update_star,
-    star::delete_star,
-    planet::list_all_planets,
-    planet::create_planet,
-    planet::update_planet,
-    planet::delete_planet
+    routes::galaxy::get_all_galaxies,
+    routes::galaxy::create_galaxy,
+    routes::galaxy::update_galaxy,
+    routes::galaxy::delete_galaxy,
+    routes::star::get_all_stars,
+    routes::star::create_star,
+    routes::star::update_star,
+    routes::star::delete_star,
+    routes::planet::get_all_planets,
+    routes::planet::create_planet,
+    routes::planet::update_planet,
+    routes::planet::delete_planet,
   ),
-  components(schemas(
-    galaxy::Galaxy,
-    galaxy::CreateGalaxyData,
-    galaxy::UpdateGalaxyData,
-    star::Star,
-    star::CreateStarData,
-    star::UpdateStarData,
-    planet::Planet,
-    planet::CreatePlanetData,
-    planet::UpdatePlanetData,
-    planet::ConnectPlanetToStar
-  ))
+  components(
+    schemas(
+      models::galaxy::Galaxy,
+      models::galaxy::CreateGalaxyData,
+      models::galaxy::UpdateGalaxyData,
+      models::star::Star,
+      models::star::CreateStarData,
+      models::star::UpdateStarData,
+      models::planet::Planet,
+      models::planet::ConnectPlanetToStar,
+      models::planet::CreatePlanetData,
+      models::planet::UpdatePlanetData,
+    ),
+    responses(
+      error::NotFoundResponse,
+      error::AlreadyExistsResponse,
+      error::ValidationResponse,
+      error::InternalErrorResponse,
+      routes::galaxy::GalaxiesList,
+      routes::galaxy::GalaxyCreated,
+      routes::galaxy::GalaxyUpdated,
+      routes::galaxy::GalaxyDeleted,
+      routes::star::StarsList,
+      routes::star::StarCreated,
+      routes::star::StarUpdated,
+      routes::star::StarDeleted,
+      routes::planet::PlanetsList,
+      routes::planet::PlanetCreated,
+      routes::planet::PlanetUpdated,
+      routes::planet::PlanetDeleted,
+    )
+  )
 )]
 pub struct ApiSpec;

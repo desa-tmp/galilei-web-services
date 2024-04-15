@@ -12,28 +12,24 @@
     "/galaxies": {
       "get": {
         "tags": [
-          "galaxy"
+          "routes::galaxy"
         ],
-        "operationId": "list_all_galaxies",
+        "operationId": "get_all_galaxies",
         "responses": {
           "200": {
-            "description": "all user galaxies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Galaxy"
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/GalaxiesList"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       },
       "post": {
         "tags": [
-          "galaxy"
+          "routes::galaxy"
         ],
         "operationId": "create_galaxy",
         "requestBody": {
@@ -49,14 +45,19 @@
         },
         "responses": {
           "200": {
-            "description": "galaxy successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Galaxy"
-                }
-              }
-            }
+            "$ref": "#/components/responses/GalaxyCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       }
@@ -64,14 +65,13 @@
     "/galaxies/{galaxy_id}": {
       "put": {
         "tags": [
-          "galaxy"
+          "routes::galaxy"
         ],
         "operationId": "update_galaxy",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy to update",
             "required": true,
             "schema": {
               "type": "string",
@@ -92,27 +92,31 @@
         },
         "responses": {
           "200": {
-            "description": "galaxy successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Galaxy"
-                }
-              }
-            }
+            "$ref": "#/components/responses/GalaxyUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       },
       "delete": {
         "tags": [
-          "galaxy"
+          "routes::galaxy"
         ],
         "operationId": "delete_galaxy",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of galaxy to delete",
             "required": true,
             "schema": {
               "type": "string",
@@ -122,14 +126,13 @@
         ],
         "responses": {
           "200": {
-            "description": "galaxy successfully deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Galaxy"
-                }
-              }
-            }
+            "$ref": "#/components/responses/GalaxyDeleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       }
@@ -137,14 +140,13 @@
     "/galaxies/{galaxy_id}/planets": {
       "get": {
         "tags": [
-          "planet"
+          "routes::planet"
         ],
-        "operationId": "list_all_planets",
+        "operationId": "get_all_planets",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where planets are contained",
             "required": true,
             "schema": {
               "type": "string",
@@ -154,30 +156,25 @@
         ],
         "responses": {
           "200": {
-            "description": "all planets in the galaxy",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Planet"
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlanetsList"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       },
       "post": {
         "tags": [
-          "planet"
+          "routes::planet"
         ],
         "operationId": "create_planet",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where the planet will created",
             "required": true,
             "schema": {
               "type": "string",
@@ -198,14 +195,19 @@
         },
         "responses": {
           "200": {
-            "description": "planet successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Planet"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlanetCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       }
@@ -213,14 +215,13 @@
     "/galaxies/{galaxy_id}/planets/{planet_id}": {
       "put": {
         "tags": [
-          "planet"
+          "routes::planet"
         ],
         "operationId": "update_planet",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where the planet is contained",
             "required": true,
             "schema": {
               "type": "string",
@@ -230,7 +231,6 @@
           {
             "name": "planet_id",
             "in": "path",
-            "description": "id of the planet to update",
             "required": true,
             "schema": {
               "type": "string",
@@ -251,27 +251,31 @@
         },
         "responses": {
           "200": {
-            "description": "planet successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Planet"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlanetUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       },
       "delete": {
         "tags": [
-          "planet"
+          "routes::planet"
         ],
         "operationId": "delete_planet",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where the planet is contained",
             "required": true,
             "schema": {
               "type": "string",
@@ -281,7 +285,6 @@
           {
             "name": "planet_id",
             "in": "path",
-            "description": "id of the planet to delete",
             "required": true,
             "schema": {
               "type": "string",
@@ -291,14 +294,13 @@
         ],
         "responses": {
           "200": {
-            "description": "planet successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Planet"
-                }
-              }
-            }
+            "$ref": "#/components/responses/PlanetDeleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       }
@@ -306,14 +308,13 @@
     "/galaxies/{galaxy_id}/stars": {
       "get": {
         "tags": [
-          "star"
+          "routes::star"
         ],
-        "operationId": "list_all_stars",
+        "operationId": "get_all_stars",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where stars are contained",
             "required": true,
             "schema": {
               "type": "string",
@@ -323,30 +324,25 @@
         ],
         "responses": {
           "200": {
-            "description": "all stars in the galaxy",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Star"
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/StarsList"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       },
       "post": {
         "tags": [
-          "star"
+          "routes::star"
         ],
         "operationId": "create_star",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where the star will created",
             "required": true,
             "schema": {
               "type": "string",
@@ -367,14 +363,19 @@
         },
         "responses": {
           "200": {
-            "description": "star successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Star"
-                }
-              }
-            }
+            "$ref": "#/components/responses/StarCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       }
@@ -382,14 +383,13 @@
     "/galaxies/{galaxy_id}/stars/{star_id}": {
       "put": {
         "tags": [
-          "star"
+          "routes::star"
         ],
         "operationId": "update_star",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where the star is contained",
             "required": true,
             "schema": {
               "type": "string",
@@ -399,7 +399,6 @@
           {
             "name": "star_id",
             "in": "path",
-            "description": "id of the star to update",
             "required": true,
             "schema": {
               "type": "string",
@@ -420,27 +419,31 @@
         },
         "responses": {
           "200": {
-            "description": "star successfully updated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Star"
-                }
-              }
-            }
+            "$ref": "#/components/responses/StarUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       },
       "delete": {
         "tags": [
-          "star"
+          "routes::star"
         ],
         "operationId": "delete_star",
         "parameters": [
           {
             "name": "galaxy_id",
             "in": "path",
-            "description": "id of the galaxy where the star is contained",
             "required": true,
             "schema": {
               "type": "string",
@@ -450,7 +453,6 @@
           {
             "name": "star_id",
             "in": "path",
-            "description": "id of the star to delete",
             "required": true,
             "schema": {
               "type": "string",
@@ -460,14 +462,13 @@
         ],
         "responses": {
           "200": {
-            "description": "star successfully created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Star"
-                }
-              }
-            }
+            "$ref": "#/components/responses/StarDeleted"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
           }
         }
       }
@@ -488,15 +489,12 @@
       "CreateGalaxyData": {
         "type": "object",
         "required": [
-          "name",
-          "description"
+          "name"
         ],
         "properties": {
-          "description": {
-            "type": "string"
-          },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -504,21 +502,22 @@
         "type": "object",
         "required": [
           "name",
-          "capacity"
+          "capacity",
+          "star"
         ],
         "properties": {
           "capacity": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
+            "maximum": 2147483647,
             "minimum": 0
           },
           "name": {
-            "type": "string"
-          },
-          "star_id": {
             "type": "string",
-            "format": "uuid",
-            "nullable": true
+            "minLength": 1
+          },
+          "star": {
+            "$ref": "#/components/schemas/ConnectPlanetToStar"
           }
         }
       },
@@ -530,10 +529,12 @@
         ],
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "nebula": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
           }
         }
       },
@@ -542,19 +543,16 @@
         "required": [
           "id",
           "name",
-          "description",
           "user_id"
         ],
         "properties": {
-          "description": {
-            "type": "string"
-          },
           "id": {
             "type": "string",
             "format": "uuid"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "user_id": {
             "type": "string",
@@ -573,7 +571,8 @@
         "properties": {
           "capacity": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
+            "maximum": 2147483647,
             "minimum": 0
           },
           "galaxy_id": {
@@ -585,7 +584,8 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "star_id": {
             "type": "string",
@@ -612,23 +612,22 @@
             "format": "uuid"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "nebula": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
           }
         }
       },
       "UpdateGalaxyData": {
         "type": "object",
         "properties": {
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
           "name": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "minLength": 1
           }
         }
       },
@@ -637,13 +636,15 @@
         "properties": {
           "capacity": {
             "type": "integer",
-            "format": "int64",
+            "format": "int32",
             "nullable": true,
+            "maximum": 2147483647,
             "minimum": 0
           },
           "name": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "minLength": 1
           },
           "star": {
             "allOf": [
@@ -660,11 +661,240 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "minLength": 1
           },
           "nebula": {
             "type": "string",
+            "format": "uri",
             "nullable": true
+          }
+        }
+      }
+    },
+    "responses": {
+      "AlreadyExistsResponse": {
+        "description": "The resource already exists",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status_code",
+                "message"
+              ],
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "status_code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "GalaxiesList": {
+        "description": "all user galaxies",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Galaxy"
+              }
+            }
+          }
+        }
+      },
+      "GalaxyCreated": {
+        "description": "galaxy successfully created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Galaxy"
+            }
+          }
+        }
+      },
+      "GalaxyDeleted": {
+        "description": "galaxy successfully deleted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Galaxy"
+            }
+          }
+        }
+      },
+      "GalaxyUpdated": {
+        "description": "galaxy successfully updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Galaxy"
+            }
+          }
+        }
+      },
+      "InternalErrorResponse": {
+        "description": "An internal error occurred",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status_code",
+                "message"
+              ],
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "status_code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFoundResponse": {
+        "description": "Requested resources not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status_code",
+                "message"
+              ],
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "status_code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "PlanetCreated": {
+        "description": "planet successfully created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Planet"
+            }
+          }
+        }
+      },
+      "PlanetDeleted": {
+        "description": "planet successfully deleted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Planet"
+            }
+          }
+        }
+      },
+      "PlanetUpdated": {
+        "description": "planet successfully updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Planet"
+            }
+          }
+        }
+      },
+      "PlanetsList": {
+        "description": "all planets in the galaxy",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Planet"
+              }
+            }
+          }
+        }
+      },
+      "StarCreated": {
+        "description": "star successfully created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Star"
+            }
+          }
+        }
+      },
+      "StarDeleted": {
+        "description": "star successfully deleted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Star"
+            }
+          }
+        }
+      },
+      "StarUpdated": {
+        "description": "star successfully updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Star"
+            }
+          }
+        }
+      },
+      "StarsList": {
+        "description": "all stars in the galaxy",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Star"
+              }
+            }
+          }
+        }
+      },
+      "ValidationResponse": {
+        "description": "The body of the request contains incorrect data",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status_code",
+                "message"
+              ],
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "status_code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
           }
         }
       }
