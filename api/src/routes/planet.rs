@@ -1,12 +1,5 @@
-use super::FromPath;
-use crate::error::{
-  AlreadyExistsResponse, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
-use crate::impl_json_responder;
-use crate::models::planet::{
-  CreatePlanetData, CrudOperations, GalaxyPath, Planet, PlanetPath, UpdatePlanetData,
-};
-use crate::prelude::*;
+use std::sync::Arc;
+
 use actix_web::{
   delete, get,
   http::StatusCode,
@@ -16,6 +9,17 @@ use actix_web::{
 use derive_more::From;
 use serde::Serialize;
 use validator::Validate;
+
+use crate::database::Pool;
+use crate::error::{
+  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+};
+use crate::impl_json_responder;
+use crate::models::planet::{
+  CreatePlanetData, CrudOperations, GalaxyPath, Planet, PlanetPath, UpdatePlanetData,
+};
+
+use super::FromPath;
 
 impl FromPath for PlanetPath {}
 
@@ -37,7 +41,10 @@ impl_json_responder!(PlanetsList, StatusCode::OK);
   )
 )]
 #[get("/galaxies/{galaxy_id}/planets")]
-pub async fn get_all_planets(pool: Data<Pool>, path: Path<GalaxyPath>) -> Result<PlanetsList> {
+pub async fn get_all_planets(
+  pool: Data<Arc<Pool>>,
+  path: Path<GalaxyPath>,
+) -> ApiResult<PlanetsList> {
   let galaxy_id = GalaxyPath::from_path(path);
 
   let planets = Planet::all(&pool, galaxy_id).await?;
@@ -71,10 +78,10 @@ impl_json_responder!(PlanetCreated, StatusCode::CREATED);
 )]
 #[post("/galaxies/{galaxy_id}/planets")]
 pub async fn create_planet(
-  pool: Data<Pool>,
+  pool: Data<Arc<Pool>>,
   path: Path<GalaxyPath>,
   Json(data): Json<CreatePlanetData>,
-) -> Result<PlanetCreated> {
+) -> ApiResult<PlanetCreated> {
   let galaxy_id = GalaxyPath::from_path(path);
 
   data.validate()?;
@@ -110,10 +117,10 @@ impl_json_responder!(PlanetUpdated, StatusCode::OK);
 )]
 #[put("/galaxies/{galaxy_id}/planets/{planet_id}")]
 pub async fn update_planet(
-  pool: Data<Pool>,
+  pool: Data<Arc<Pool>>,
   path: Path<PlanetPath>,
   Json(data): Json<UpdatePlanetData>,
-) -> Result<PlanetUpdated> {
+) -> ApiResult<PlanetUpdated> {
   let planet_id = PlanetPath::from_path(path);
 
   data.validate()?;
@@ -141,7 +148,10 @@ impl_json_responder!(PlanetDeleted, StatusCode::OK);
   )
 )]
 #[delete("/galaxies/{galaxy_id}/planets/{planet_id}")]
-pub async fn delete_planet(pool: Data<Pool>, path: Path<PlanetPath>) -> Result<PlanetDeleted> {
+pub async fn delete_planet(
+  pool: Data<Arc<Pool>>,
+  path: Path<PlanetPath>,
+) -> ApiResult<PlanetDeleted> {
   let planet_id = PlanetPath::from_path(path);
 
   let deleted_planet = Planet::delete(&pool, planet_id).await?;

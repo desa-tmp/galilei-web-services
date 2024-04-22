@@ -1,12 +1,5 @@
-use super::FromPath;
-use crate::error::{
-  AlreadyExistsResponse, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
-use crate::impl_json_responder;
-use crate::models::star::{
-  CreateStarData, CrudOperations, GalaxyPath, Star, StarPath, UpdateStarData,
-};
-use crate::prelude::*;
+use std::sync::Arc;
+
 use actix_web::{
   delete, get,
   http::StatusCode,
@@ -16,6 +9,17 @@ use actix_web::{
 use derive_more::From;
 use serde::Serialize;
 use validator::Validate;
+
+use crate::database::Pool;
+use crate::error::{
+  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+};
+use crate::impl_json_responder;
+use crate::models::star::{
+  CreateStarData, CrudOperations, GalaxyPath, Star, StarPath, UpdateStarData,
+};
+
+use super::FromPath;
 
 impl FromPath for StarPath {}
 
@@ -37,7 +41,7 @@ impl_json_responder!(StarsList, StatusCode::OK);
   )
 )]
 #[get("/galaxies/{galaxy_id}/stars")]
-pub async fn get_all_stars(pool: Data<Pool>, path: Path<GalaxyPath>) -> Result<StarsList> {
+pub async fn get_all_stars(pool: Data<Arc<Pool>>, path: Path<GalaxyPath>) -> ApiResult<StarsList> {
   let galaxy_id = GalaxyPath::from_path(path);
 
   let stars = Star::all(&pool, galaxy_id).await?;
@@ -71,10 +75,10 @@ impl_json_responder!(StarCreated, StatusCode::CREATED);
 )]
 #[post("/galaxies/{galaxy_id}/stars")]
 pub async fn create_star(
-  pool: Data<Pool>,
+  pool: Data<Arc<Pool>>,
   path: Path<GalaxyPath>,
   Json(data): Json<CreateStarData>,
-) -> Result<StarCreated> {
+) -> ApiResult<StarCreated> {
   let galaxy_id = GalaxyPath::from_path(path);
 
   data.validate()?;
@@ -110,10 +114,10 @@ impl_json_responder!(StarUpdated, StatusCode::OK);
 )]
 #[put("/galaxies/{galaxy_id}/stars/{star_id}")]
 pub async fn update_star(
-  pool: Data<Pool>,
+  pool: Data<Arc<Pool>>,
   path: Path<StarPath>,
   Json(data): Json<UpdateStarData>,
-) -> Result<StarUpdated> {
+) -> ApiResult<StarUpdated> {
   let star_id = StarPath::from_path(path);
 
   data.validate()?;
@@ -141,7 +145,7 @@ impl_json_responder!(StarDeleted, StatusCode::OK);
   )
 )]
 #[delete("/galaxies/{galaxy_id}/stars/{star_id}")]
-pub async fn delete_star(pool: Data<Pool>, path: Path<StarPath>) -> Result<StarDeleted> {
+pub async fn delete_star(pool: Data<Arc<Pool>>, path: Path<StarPath>) -> ApiResult<StarDeleted> {
   let star_id = StarPath::from_path(path);
 
   let deleted_star = Star::delete(&pool, star_id).await?;

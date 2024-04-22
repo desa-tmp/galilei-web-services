@@ -1,6 +1,10 @@
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web::{
+  middleware::{Logger, NormalizePath},
+  web, App, HttpServer,
+};
+use api::auth::AuthService;
 use dotenv::dotenv;
-use std::env;
+use std::{env, sync::Arc};
 
 const MAX_CONNECTIONS: u32 = 10;
 
@@ -20,14 +24,18 @@ async fn main() -> std::io::Result<()> {
     .expect("Successfully connect to database");
 
   HttpServer::new(move || {
-    let logger = Logger::default();
-
     App::new()
-      .app_data(web::Data::new(pool.clone()))
-      .wrap(logger)
-      .configure(api::routes::galaxy::config)
-      .configure(api::routes::star::config)
-      .configure(api::routes::planet::config)
+      .app_data(web::Data::new(Arc::clone(&pool)))
+      .wrap(NormalizePath::trim())
+      .wrap(Logger::default())
+      .configure(api::routes::auth::config)
+      .service(
+        web::scope("")
+          .wrap(AuthService::new(Arc::clone(&pool)))
+          .configure(api::routes::galaxy::config)
+          .configure(api::routes::star::config)
+          .configure(api::routes::planet::config),
+      )
   })
   .bind(("127.0.0.1", 8080))?
   .run()

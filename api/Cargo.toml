@@ -8,7 +8,7 @@ default-run = "api"
 
 [dependencies]
 serde = { version = "1.0.195", features = ["derive"] }
-actix-web = "4.4.1"
+actix-web = { version = "4.4.1", features = ["secure-cookies"] }
 kube = { version = "0.88.1", features = ["runtime", "derive"] }
 k8s-openapi = { version = "0.21.0", features = ["latest"] }
 utoipa = { version = "4.2.0", features = ["actix_extras", "uuid", "url"] }
@@ -26,3 +26,8 @@ derive_more = "0.99.17"
 env_logger = "0.11.3"
 log = "0.4.21"
 async-trait = "0.1.80"
+sha2 = "0.10.8"
+base64 = "0.22.0"
+getrandom = "0.2.14"
+argon2 = "0.5.3"
+hex = "0.4.3"

@@ -7,10 +7,14 @@ use serde::Serialize;
 use utoipa::{ToResponse, ToSchema};
 use validator::ValidationErrors;
 
-pub type Result<T, E = ApiError> = std::result::Result<T, E>;
+use crate::{auth, database};
+
+pub type ApiResult<T, E = ApiError> = std::result::Result<T, E>;
 
 #[derive(Debug, Display, Error, From)]
 pub enum ApiError {
+  #[display(fmt = "User not authorized")]
+  Unauthorize,
   #[display(fmt = "Requested resources not found")]
   NotFound,
   #[display(fmt = "The resource already exists")]
@@ -21,16 +25,22 @@ pub enum ApiError {
   InternalError,
 }
 
-impl From<sqlx::Error> for ApiError {
-  fn from(value: sqlx::Error) -> Self {
+impl From<database::DbError> for ApiError {
+  fn from(value: database::DbError) -> Self {
     match value {
-      sqlx::Error::RowNotFound => Self::NotFound,
-      sqlx::Error::Database(err) => match err.kind() {
-        sqlx::error::ErrorKind::UniqueViolation => Self::AlreadyExists,
-        sqlx::error::ErrorKind::ForeignKeyViolation => Self::NotFound,
-        _ => Self::InternalError,
-      },
-      _ => Self::InternalError,
+      database::DbError::NotFound => ApiError::NotFound,
+      database::DbError::AlreadyExists => ApiError::AlreadyExists,
+      database::DbError::Auth(err) => ApiError::from(err),
+      _ => ApiError::InternalError,
+    }
+  }
+}
+
+impl From<auth::AuthError> for ApiError {
+  fn from(value: auth::AuthError) -> Self {
+    match value {
+      auth::AuthError::Invalid => ApiError::Unauthorize,
+      auth::AuthError::Other(_) => ApiError::InternalError,
     }
   }
 }
@@ -49,6 +59,7 @@ impl ResponseError for ApiError {
 
   fn status_code(&self) -> actix_web::http::StatusCode {
     match self {
+      ApiError::Unauthorize => StatusCode::UNAUTHORIZED,
       ApiError::NotFound => StatusCode::NOT_FOUND,
       ApiError::AlreadyExists => StatusCode::CONFLICT,
       ApiError::Validation(_) => StatusCode::BAD_REQUEST,
@@ -62,6 +73,10 @@ pub struct ErrorResponse {
   status_code: u16,
   message: String,
 }
+
+#[derive(ToResponse)]
+#[response(description = "User not authorized", content_type = "application/json")]
+pub struct UnauthorizeResponse(#[to_schema] ErrorResponse);
 
 #[derive(ToResponse)]
 #[response(

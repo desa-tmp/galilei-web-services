@@ -1,21 +1,25 @@
-use super::FromPath;
-use crate::error::{
-  AlreadyExistsResponse, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
-use crate::impl_json_responder;
-use crate::models::galaxy::{CreateGalaxyData, Galaxy, GalaxyPath, UpdateGalaxyData, UserId};
-use crate::models::CrudOperations;
-use crate::prelude::*;
 use actix_web::{
   delete, get,
   http::StatusCode,
   post, put,
-  web::{Data, Json, Path, ServiceConfig},
+  web::{Data, Json, Path, ReqData, ServiceConfig},
 };
 use derive_more::From;
 use serde::Serialize;
-use std::str::FromStr;
+use std::sync::Arc;
 use validator::Validate;
+
+use crate::database::Pool;
+use crate::error::{
+  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+};
+use crate::impl_json_responder;
+use crate::models::{
+  galaxy::{CreateGalaxyData, Galaxy, GalaxyPath, UpdateGalaxyData, UserId},
+  CrudOperations,
+};
+
+use super::FromPath;
 
 impl FromPath for GalaxyPath {}
 
@@ -33,10 +37,11 @@ impl_json_responder!(GalaxiesList, StatusCode::OK);
   )
 )]
 #[get("/galaxies")]
-pub async fn get_all_galaxies(pool: Data<Pool>) -> Result<GalaxiesList> {
-  let user_id = UserId::from_str("4cde5822-0abb-41f3-abad-4b08e01fcbc3").expect("Valid UUID");
-
-  let galaxies = Galaxy::all(&pool, user_id).await?;
+pub async fn get_all_galaxies(
+  pool: Data<Arc<Pool>>,
+  user_id: ReqData<UserId>,
+) -> ApiResult<GalaxiesList> {
+  let galaxies = Galaxy::all(&pool, user_id.into_inner()).await?;
 
   Ok(GalaxiesList::from(galaxies))
 }
@@ -66,14 +71,13 @@ impl_json_responder!(GalaxyCreated, StatusCode::CREATED);
 )]
 #[post("/galaxies")]
 pub async fn create_galaxy(
-  pool: Data<Pool>,
+  pool: Data<Arc<Pool>>,
+  user_id: ReqData<UserId>,
   Json(data): Json<CreateGalaxyData>,
-) -> Result<GalaxyCreated> {
-  let user_id = UserId::from_str("4cde5822-0abb-41f3-abad-4b08e01fcbc3").expect("Valid UUID");
-
+) -> ApiResult<GalaxyCreated> {
   data.validate()?;
 
-  let new_galaxy = Galaxy::create(&pool, user_id, data).await?;
+  let new_galaxy = Galaxy::create(&pool, user_id.into_inner(), data).await?;
 
   Ok(GalaxyCreated::from(new_galaxy))
 }
@@ -104,10 +108,10 @@ impl_json_responder!(GalaxyUpdated, StatusCode::OK);
 )]
 #[put("/galaxies/{galaxy_id}")]
 pub async fn update_galaxy(
-  pool: Data<Pool>,
+  pool: Data<Arc<Pool>>,
   path: Path<GalaxyPath>,
   Json(data): Json<UpdateGalaxyData>,
-) -> Result<GalaxyUpdated> {
+) -> ApiResult<GalaxyUpdated> {
   let galaxy_path = GalaxyPath::from_path(path);
 
   data.validate()?;
@@ -135,7 +139,10 @@ impl_json_responder!(GalaxyDeleted, StatusCode::OK);
   )
 )]
 #[delete("/galaxies/{galaxy_id}")]
-pub async fn delete_galaxy(pool: Data<Pool>, path: Path<GalaxyPath>) -> Result<GalaxyDeleted> {
+pub async fn delete_galaxy(
+  pool: Data<Arc<Pool>>,
+  path: Path<GalaxyPath>,
+) -> ApiResult<GalaxyDeleted> {
   let galaxy_id = GalaxyPath::from_path(path);
 
   let deleted_galaxy = Galaxy::delete(&pool, galaxy_id).await?;

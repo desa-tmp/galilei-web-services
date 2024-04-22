@@ -1,10 +1,12 @@
-use crate::{gen_update_data, prelude::*};
 use async_trait::async_trait;
-use derive_more::{From, FromStr};
+use derive_more::From;
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 use validator::Validate;
+
+use crate::database::{DbResult, Pool};
+use crate::gen_update_data;
 
 pub use super::CrudOperations;
 
@@ -26,7 +28,7 @@ gen_update_data! {
   }
 }
 
-#[derive(Debug, FromStr, Deserialize)]
+#[derive(Debug, From, Deserialize, Clone)]
 pub struct UserId(Uuid);
 
 #[derive(Debug, From, Deserialize, IntoParams)]
@@ -40,59 +42,63 @@ impl CrudOperations for Galaxy {
   type CreateData = CreateGalaxyData;
   type UpdateData = UpdateGalaxyData;
 
-  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> sqlx::Result<Vec<Self>> {
+  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
     let UserId(user_id) = ident;
 
-    sqlx::query_as!(Galaxy, "SELECT * FROM galaxies WHERE user_id = $1", user_id)
+    let galaxies = sqlx::query_as!(Galaxy, "SELECT * FROM galaxies WHERE user_id = $1", user_id)
       .fetch_all(pool)
-      .await
+      .await?;
+
+    Ok(galaxies)
   }
 
-  async fn create(
-    pool: &Pool,
-    ident: Self::OwnerIdent,
-    data: Self::CreateData,
-  ) -> sqlx::Result<Self> {
+  async fn create(pool: &Pool, ident: Self::OwnerIdent, data: Self::CreateData) -> DbResult<Self> {
     let UserId(user_id) = ident;
     let CreateGalaxyData { name } = data;
 
-    sqlx::query_as!(
+    let new_user = sqlx::query_as!(
       Galaxy,
       "INSERT INTO galaxies(name, user_id) VALUES ($1, $2) RETURNING *",
       name,
       user_id
     )
     .fetch_one(pool)
-    .await
+    .await?;
+
+    Ok(new_user)
   }
 
   async fn update(
     pool: &Pool,
     ident: Self::ResourceIdent,
     data: Self::UpdateData,
-  ) -> sqlx::Result<Self> {
+  ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
     let UpdateGalaxyData { name } = data;
 
-    sqlx::query_as!(
+    let updated_user = sqlx::query_as!(
       Galaxy,
       "UPDATE galaxies SET name = COALESCE($1, name) WHERE id = $2 RETURNING *",
       name,
       galaxy_id
     )
     .fetch_one(pool)
-    .await
+    .await?;
+
+    Ok(updated_user)
   }
 
-  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> sqlx::Result<Self> {
+  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
 
-    sqlx::query_as!(
+    let deleted_user = sqlx::query_as!(
       Galaxy,
       "DELETE FROM galaxies WHERE id = $1 RETURNING *",
       galaxy_id
     )
     .fetch_one(pool)
-    .await
+    .await?;
+
+    Ok(deleted_user)
   }
 }

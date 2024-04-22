@@ -1,10 +1,12 @@
-use crate::{gen_update_data, prelude::*};
 use async_trait::async_trait;
 use derive_more::From;
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 use validator::Validate;
+
+use crate::database::{DbResult, Pool};
+use crate::gen_update_data;
 
 pub use super::{galaxy::GalaxyPath, CrudOperations};
 
@@ -49,22 +51,21 @@ impl CrudOperations for Planet {
   type CreateData = CreatePlanetData;
   type UpdateData = UpdatePlanetData;
 
-  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> sqlx::Result<Vec<Self>> {
+  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
     let GalaxyPath(galaxy_id) = ident;
 
-    sqlx::query_as!(
+    let galaxies = sqlx::query_as!(
       Planet,
       "SELECT * FROM planets WHERE galaxy_id = $1",
       galaxy_id
     )
     .fetch_all(pool)
-    .await
+    .await?;
+
+    Ok(galaxies)
   }
-  async fn create(
-    pool: &Pool,
-    ident: Self::OwnerIdent,
-    data: Self::CreateData,
-  ) -> sqlx::Result<Self> {
+
+  async fn create(pool: &Pool, ident: Self::OwnerIdent, data: Self::CreateData) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
     let CreatePlanetData {
       name,
@@ -72,7 +73,7 @@ impl CrudOperations for Planet {
       star,
     } = data;
 
-    sqlx::query_as!(
+    let new_galaxy = sqlx::query_as!(
       Planet,
       "INSERT INTO planets(name, capacity, star_id, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
       name,
@@ -81,13 +82,15 @@ impl CrudOperations for Planet {
       galaxy_id
     )
     .fetch_one(pool)
-    .await
+    .await?;
+
+    Ok(new_galaxy)
   }
   async fn update(
     pool: &Pool,
     ident: Self::ResourceIdent,
     data: Self::UpdateData,
-  ) -> sqlx::Result<Self> {
+  ) -> DbResult<Self> {
     let PlanetPath(galaxy_id, planet_id) = ident;
     let UpdatePlanetData {
       name,
@@ -98,7 +101,7 @@ impl CrudOperations for Planet {
     let update_star = star.is_some();
     let star_id = star.map(|con| con.id).unwrap_or(None);
 
-    sqlx::query_as!(
+    let updated_galaxy = sqlx::query_as!(
       Planet,
       r#"
       UPDATE planets
@@ -116,18 +119,23 @@ impl CrudOperations for Planet {
       planet_id
     )
     .fetch_one(pool)
-    .await
+    .await?;
+
+    Ok(updated_galaxy)
   }
-  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> sqlx::Result<Self> {
+
+  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> DbResult<Self> {
     let PlanetPath(galaxy_id, planet_id) = ident;
 
-    sqlx::query_as!(
+    let deleted_galaxy = sqlx::query_as!(
       Planet,
       "DELETE FROM planets WHERE galaxy_id = $1 AND id = $2 RETURNING *",
       galaxy_id,
       planet_id
     )
     .fetch_one(pool)
-    .await
+    .await?;
+
+    Ok(deleted_galaxy)
   }
 }

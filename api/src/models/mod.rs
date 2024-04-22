@@ -1,29 +1,47 @@
-use crate::database::Pool;
 use async_trait::async_trait;
+
+use crate::database::{DbError, DbResult, Operation, Pool};
 
 pub mod galaxy;
 pub mod planet;
+pub mod session;
 pub mod star;
+pub mod user;
 
 #[async_trait]
 pub trait CrudOperations: Sized {
-  type OwnerIdent;
-  type ResourceIdent;
-  type CreateData;
-  type UpdateData;
+  type OwnerIdent: Send;
+  type ResourceIdent: Send;
+  type CreateData: Send;
+  type UpdateData: Send;
 
-  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> sqlx::Result<Vec<Self>>;
+  async fn all(_pool: &Pool, _ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
+    Err(DbError::OperationNotImplemented(Operation::All))
+  }
+
+  async fn get(_pool: &Pool, _ident: Self::ResourceIdent) -> DbResult<Self> {
+    Err(DbError::OperationNotImplemented(Operation::Get))
+  }
+
   async fn create(
-    pool: &Pool,
-    ident: Self::OwnerIdent,
-    data: Self::CreateData,
-  ) -> sqlx::Result<Self>;
+    _pool: &Pool,
+    _ident: Self::OwnerIdent,
+    _data: Self::CreateData,
+  ) -> DbResult<Self> {
+    Err(DbError::OperationNotImplemented(Operation::Create))
+  }
+
   async fn update(
-    pool: &Pool,
-    ident: Self::ResourceIdent,
-    data: Self::UpdateData,
-  ) -> sqlx::Result<Self>;
-  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> sqlx::Result<Self>;
+    _pool: &Pool,
+    _ident: Self::ResourceIdent,
+    _data: Self::UpdateData,
+  ) -> DbResult<Self> {
+    Err(DbError::OperationNotImplemented(Operation::Update))
+  }
+
+  async fn delete(_pool: &Pool, _ident: Self::ResourceIdent) -> DbResult<Self> {
+    Err(DbError::OperationNotImplemented(Operation::Delete))
+  }
 }
 
 #[macro_export]
