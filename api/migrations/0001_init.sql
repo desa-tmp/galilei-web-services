@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS sessions (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
-  expires TIMESTAMP NOT NULL,
+  token TEXT NOT NULL UNIQUE,
+  expires TIMESTAMP,
   user_id UUID NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
