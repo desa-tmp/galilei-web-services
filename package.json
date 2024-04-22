@@ -3,18 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "pnpm run \"/dev:.*/\"",
     "dev:web": "pnpm -r run dev",
-    "dev:api": "cargo watch -w ./api/ -x \"run -p api\"",
-    "build": "pnpm run \"/build:.*/\"",
-    "build:web": "pnpm -r run build",
-    "build:api": "cargo build",
-    "lint": "pnpm run \"/lint:.*/\"",
-    "lint:web": "pnpm -r run lint",
-    "lint:api": "cargo check --workspace",
-    "fmt": "pnpm run \"/fmt:.*/\"",
-    "fmt:web": "prettier --cache -w .",
-    "fmt:api": "cargo fmt --all"
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "fmt": "prettier --cache -w ."
   },
   "devDependencies": {
     "prettier": "^3.2.2",
