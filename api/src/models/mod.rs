@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 
-use crate::database::{DbError, DbResult, Operation, Pool};
+use crate::database::{Connection, DbError, DbResult, Operation};
 
 pub mod galaxy;
 pub mod planet;
@@ -15,16 +15,16 @@ pub trait CrudOperations: Sized {
   type CreateData: Send;
   type UpdateData: Send;
 
-  async fn all(_pool: &Pool, _ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
+  async fn all(_tx: &mut Connection, _ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
     Err(DbError::OperationNotImplemented(Operation::All))
   }
 
-  async fn get(_pool: &Pool, _ident: Self::ResourceIdent) -> DbResult<Self> {
+  async fn get(_tx: &mut Connection, _ident: Self::ResourceIdent) -> DbResult<Self> {
     Err(DbError::OperationNotImplemented(Operation::Get))
   }
 
   async fn create(
-    _pool: &Pool,
+    _tx: &mut Connection,
     _ident: Self::OwnerIdent,
     _data: Self::CreateData,
   ) -> DbResult<Self> {
@@ -32,14 +32,14 @@ pub trait CrudOperations: Sized {
   }
 
   async fn update(
-    _pool: &Pool,
+    _tx: &mut Connection,
     _ident: Self::ResourceIdent,
     _data: Self::UpdateData,
   ) -> DbResult<Self> {
     Err(DbError::OperationNotImplemented(Operation::Update))
   }
 
-  async fn delete(_pool: &Pool, _ident: Self::ResourceIdent) -> DbResult<Self> {
+  async fn delete(_tx: &mut Connection, _ident: Self::ResourceIdent) -> DbResult<Self> {
     Err(DbError::OperationNotImplemented(Operation::Delete))
   }
 }

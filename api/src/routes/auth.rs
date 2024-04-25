@@ -1,9 +1,7 @@
-use std::sync::Arc;
-
 use actix_web::{
   cookie::{time::OffsetDateTime, Cookie},
   post,
-  web::{Data, Json, ServiceConfig},
+  web::{Json, ServiceConfig},
   HttpResponse, Responder,
 };
 use chrono::{Days, NaiveDateTime, Utc};
@@ -11,7 +9,7 @@ use serde::Deserialize;
 use validator::Validate;
 
 use crate::auth::Token;
-use crate::database::{DbResult, Pool};
+use crate::database::{DbResult, Transaction};
 use crate::error::ApiResult;
 use crate::models::{
   session::Session,
@@ -26,7 +24,7 @@ struct AuthResponse {
 }
 
 impl AuthResponse {
-  async fn session(pool: &Pool, remember: bool, user: User) -> DbResult<Self> {
+  async fn session(mut tx: Transaction, remember: bool, user: User) -> DbResult<Self> {
     let token = Token::generate()?;
 
     let now = Utc::now();
@@ -41,7 +39,7 @@ impl AuthResponse {
       None
     };
 
-    let session = Session::create(pool, &token, expires, &user.id).await?;
+    let session = Session::create(&mut tx, &token, expires, &user.id).await?;
 
     let expires = session.expires.map(|timestamp| {
       let utc = timestamp.and_utc();
@@ -87,7 +85,7 @@ struct AuthData {
 
 #[post("/register")]
 pub async fn register(
-  pool: Data<Arc<Pool>>,
+  mut tx: Transaction,
   Json(auth_data): Json<AuthData>,
 ) -> ApiResult<AuthResponse> {
   auth_data.validate()?;
@@ -97,14 +95,14 @@ pub async fn register(
     remember,
   } = auth_data;
 
-  let new_user = User::create(&pool, credentials).await?;
+  let new_user = User::create(&mut tx, credentials).await?;
 
-  Ok(AuthResponse::session(&pool, remember, new_user).await?)
+  Ok(AuthResponse::session(tx, remember, new_user).await?)
 }
 
 #[post("/login")]
 pub async fn login(
-  pool: Data<Arc<Pool>>,
+  mut tx: Transaction,
   Json(auth_data): Json<AuthData>,
 ) -> ApiResult<AuthResponse> {
   // validate only the received data not the auth_data in database
@@ -115,9 +113,9 @@ pub async fn login(
     remember,
   } = auth_data;
 
-  let user = User::verify_credentials(&pool, credentials).await?;
+  let user = User::verify_credentials(&mut tx, credentials).await?;
 
-  Ok(AuthResponse::session(&pool, remember, user).await?)
+  Ok(AuthResponse::session(tx, remember, user).await?)
 }
 
 pub fn config(cfg: &mut ServiceConfig) {

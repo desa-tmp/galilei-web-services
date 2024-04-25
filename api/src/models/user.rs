@@ -3,7 +3,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::auth::{AuthSecurity, Password};
-use crate::database::{DbResult, Pool};
+use crate::database::{Connection, DbResult};
 
 #[derive(Debug, Serialize)]
 pub struct User {
@@ -29,11 +29,14 @@ impl Credentials {
 }
 
 impl User {
-  pub async fn verify_credentials(pool: &Pool, credentials: Credentials) -> DbResult<User> {
+  pub async fn verify_credentials(
+    conn: &mut Connection,
+    credentials: Credentials,
+  ) -> DbResult<User> {
     let Credentials { username, password } = credentials;
 
     let user = sqlx::query_as!(User, "SELECT * FROM users WHERE name = $1", &username)
-      .fetch_one(pool)
+      .fetch_one(conn)
       .await?;
 
     password.verify(&user.password)?;
@@ -41,7 +44,7 @@ impl User {
     Ok(user)
   }
 
-  pub async fn create(pool: &Pool, credentials: Credentials) -> DbResult<User> {
+  pub async fn create(conn: &mut Connection, credentials: Credentials) -> DbResult<User> {
     let Credentials { username, password } = credentials;
 
     let password_hash = password.hash()?;
@@ -52,7 +55,7 @@ impl User {
       username,
       password_hash
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(new_user)

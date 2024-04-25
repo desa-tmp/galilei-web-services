@@ -1,5 +1,5 @@
 [workspace]
 
-members = ["api"]
+members = ["api", "crates/*"]
 
 resolver = "2"

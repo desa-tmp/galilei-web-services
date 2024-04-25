@@ -2,7 +2,7 @@ use chrono::{NaiveDateTime, Utc};
 use uuid::Uuid;
 
 use crate::auth::{AuthSecurity, Token};
-use crate::database::{DbError, DbResult, Pool};
+use crate::database::{Connection, DbError, DbResult};
 
 use super::galaxy::UserId;
 
@@ -14,18 +14,24 @@ pub struct Session {
 }
 
 impl Session {
-  pub async fn verify_token(pool: &Pool, token: Token) -> DbResult<UserId> {
+  pub async fn verify_token(conn: &mut Connection, token: Token) -> DbResult<UserId> {
     let token_hash = token.hash()?;
+
+    log::debug!("token: {:#?}", &token);
+    log::debug!("token_hash: {}", &token_hash);
 
     let row = sqlx::query!(
       "SELECT expires, user_id FROM sessions WHERE token = $1",
       token_hash
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
+    log::debug!("row: {:#?}", &row);
+
     if let Some(expires) = row.expires {
-      if expires.and_utc() > Utc::now() {
+      if expires.and_utc() < Utc::now() {
+        log::debug!("time expired {} < {}", expires.and_utc(), Utc::now());
         return Err(DbError::NotFound);
       }
     }
@@ -34,7 +40,7 @@ impl Session {
   }
 
   pub async fn create(
-    pool: &Pool,
+    conn: &mut Connection,
     token: &Token,
     expires: Option<NaiveDateTime>,
     user_id: &Uuid,
@@ -48,7 +54,7 @@ impl Session {
       expires,
       user_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(session)

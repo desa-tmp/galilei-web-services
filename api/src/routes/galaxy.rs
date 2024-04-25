@@ -2,14 +2,14 @@ use actix_web::{
   delete, get,
   http::StatusCode,
   post, put,
-  web::{Data, Json, Path, ReqData, ServiceConfig},
+  web::{Json, Path, ReqData, ServiceConfig},
 };
 use derive_more::From;
 use serde::Serialize;
-use std::sync::Arc;
+
 use validator::Validate;
 
-use crate::database::Pool;
+use crate::database::Transaction;
 use crate::error::{
   AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
 };
@@ -38,10 +38,10 @@ impl_json_responder!(GalaxiesList, StatusCode::OK);
 )]
 #[get("/galaxies")]
 pub async fn get_all_galaxies(
-  pool: Data<Arc<Pool>>,
+  mut tx: Transaction,
   user_id: ReqData<UserId>,
 ) -> ApiResult<GalaxiesList> {
-  let galaxies = Galaxy::all(&pool, user_id.into_inner()).await?;
+  let galaxies = Galaxy::all(&mut tx, user_id.into_inner()).await?;
 
   Ok(GalaxiesList::from(galaxies))
 }
@@ -71,13 +71,13 @@ impl_json_responder!(GalaxyCreated, StatusCode::CREATED);
 )]
 #[post("/galaxies")]
 pub async fn create_galaxy(
-  pool: Data<Arc<Pool>>,
+  mut tx: Transaction,
   user_id: ReqData<UserId>,
   Json(data): Json<CreateGalaxyData>,
 ) -> ApiResult<GalaxyCreated> {
   data.validate()?;
 
-  let new_galaxy = Galaxy::create(&pool, user_id.into_inner(), data).await?;
+  let new_galaxy = Galaxy::create(&mut tx, user_id.into_inner(), data).await?;
 
   Ok(GalaxyCreated::from(new_galaxy))
 }
@@ -108,7 +108,7 @@ impl_json_responder!(GalaxyUpdated, StatusCode::OK);
 )]
 #[put("/galaxies/{galaxy_id}")]
 pub async fn update_galaxy(
-  pool: Data<Arc<Pool>>,
+  mut tx: Transaction,
   path: Path<GalaxyPath>,
   Json(data): Json<UpdateGalaxyData>,
 ) -> ApiResult<GalaxyUpdated> {
@@ -116,7 +116,7 @@ pub async fn update_galaxy(
 
   data.validate()?;
 
-  let updated_galaxy = Galaxy::update(&pool, galaxy_path, data).await?;
+  let updated_galaxy = Galaxy::update(&mut tx, galaxy_path, data).await?;
 
   Ok(GalaxyUpdated::from(updated_galaxy))
 }
@@ -140,12 +140,12 @@ impl_json_responder!(GalaxyDeleted, StatusCode::OK);
 )]
 #[delete("/galaxies/{galaxy_id}")]
 pub async fn delete_galaxy(
-  pool: Data<Arc<Pool>>,
+  mut tx: Transaction,
   path: Path<GalaxyPath>,
 ) -> ApiResult<GalaxyDeleted> {
   let galaxy_id = GalaxyPath::from_path(path);
 
-  let deleted_galaxy = Galaxy::delete(&pool, galaxy_id).await?;
+  let deleted_galaxy = Galaxy::delete(&mut tx, galaxy_id).await?;
 
   Ok(GalaxyDeleted::from(deleted_galaxy))
 }

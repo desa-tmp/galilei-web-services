@@ -2,7 +2,7 @@ use actix_web::{
   middleware::{Logger, NormalizePath},
   web, App, HttpServer,
 };
-use api::auth::AuthService;
+use api::{auth::AuthService, database::TransactionService};
 use dotenv::dotenv;
 use std::{env, sync::Arc};
 
@@ -25,9 +25,8 @@ async fn main() -> std::io::Result<()> {
 
   HttpServer::new(move || {
     App::new()
-      .app_data(web::Data::new(Arc::clone(&pool)))
       .wrap(NormalizePath::trim())
-      .wrap(Logger::default())
+      .wrap(TransactionService::new(Arc::clone(&pool)))
       .configure(api::routes::auth::config)
       .service(
         web::scope("")
@@ -36,6 +35,7 @@ async fn main() -> std::io::Result<()> {
           .configure(api::routes::star::config)
           .configure(api::routes::planet::config),
       )
+      .wrap(Logger::default())
   })
   .bind(("127.0.0.1", 8080))?
   .run()

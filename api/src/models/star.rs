@@ -5,7 +5,7 @@ use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::database::{DbResult, Pool};
+use crate::database::{Connection, DbResult};
 use crate::gen_update_data;
 
 pub use super::{galaxy::GalaxyPath, CrudOperations};
@@ -44,17 +44,21 @@ impl CrudOperations for Star {
   type CreateData = CreateStarData;
   type UpdateData = UpdateStarData;
 
-  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
+  async fn all(conn: &mut Connection, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
     let GalaxyPath(galaxy_id) = ident;
 
     let stars = sqlx::query_as!(Star, "SELECT * FROM stars WHERE galaxy_id = $1", galaxy_id)
-      .fetch_all(pool)
+      .fetch_all(conn)
       .await?;
 
     Ok(stars)
   }
 
-  async fn create(pool: &Pool, ident: Self::OwnerIdent, data: Self::CreateData) -> DbResult<Self> {
+  async fn create(
+    conn: &mut Connection,
+    ident: Self::OwnerIdent,
+    data: Self::CreateData,
+  ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
     let CreateStarData { name, nebula } = data;
 
@@ -65,13 +69,13 @@ impl CrudOperations for Star {
       nebula,
       galaxy_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(new_star)
   }
   async fn update(
-    pool: &Pool,
+    conn: &mut Connection,
     ident: Self::ResourceIdent,
     data: Self::UpdateData,
   ) -> DbResult<Self> {
@@ -92,13 +96,13 @@ impl CrudOperations for Star {
       galaxy_id,
       star_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(updated_star)
   }
 
-  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> DbResult<Self> {
+  async fn delete(conn: &mut Connection, ident: Self::ResourceIdent) -> DbResult<Self> {
     let StarPath(galaxy_id, star_id) = ident;
 
     let deleted_star = sqlx::query_as!(
@@ -107,7 +111,7 @@ impl CrudOperations for Star {
       galaxy_id,
       star_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(deleted_star)

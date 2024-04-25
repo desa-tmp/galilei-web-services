@@ -5,7 +5,7 @@ use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::database::{DbResult, Pool};
+use crate::database::{Connection, DbResult};
 use crate::gen_update_data;
 
 pub use super::CrudOperations;
@@ -42,17 +42,21 @@ impl CrudOperations for Galaxy {
   type CreateData = CreateGalaxyData;
   type UpdateData = UpdateGalaxyData;
 
-  async fn all(pool: &Pool, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
+  async fn all(conn: &mut Connection, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
     let UserId(user_id) = ident;
 
     let galaxies = sqlx::query_as!(Galaxy, "SELECT * FROM galaxies WHERE user_id = $1", user_id)
-      .fetch_all(pool)
+      .fetch_all(conn)
       .await?;
 
     Ok(galaxies)
   }
 
-  async fn create(pool: &Pool, ident: Self::OwnerIdent, data: Self::CreateData) -> DbResult<Self> {
+  async fn create(
+    conn: &mut Connection,
+    ident: Self::OwnerIdent,
+    data: Self::CreateData,
+  ) -> DbResult<Self> {
     let UserId(user_id) = ident;
     let CreateGalaxyData { name } = data;
 
@@ -62,14 +66,14 @@ impl CrudOperations for Galaxy {
       name,
       user_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(new_user)
   }
 
   async fn update(
-    pool: &Pool,
+    conn: &mut Connection,
     ident: Self::ResourceIdent,
     data: Self::UpdateData,
   ) -> DbResult<Self> {
@@ -82,13 +86,13 @@ impl CrudOperations for Galaxy {
       name,
       galaxy_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(updated_user)
   }
 
-  async fn delete(pool: &Pool, ident: Self::ResourceIdent) -> DbResult<Self> {
+  async fn delete(conn: &mut Connection, ident: Self::ResourceIdent) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
 
     let deleted_user = sqlx::query_as!(
@@ -96,7 +100,7 @@ impl CrudOperations for Galaxy {
       "DELETE FROM galaxies WHERE id = $1 RETURNING *",
       galaxy_id
     )
-    .fetch_one(pool)
+    .fetch_one(conn)
     .await?;
 
     Ok(deleted_user)

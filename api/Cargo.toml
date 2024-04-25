@@ -7,6 +7,9 @@ default-run = "api"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# workspace
+transaction = { path = "../crates/transaction" }
+# external
 serde = { version = "1.0.195", features = ["derive"] }
 actix-web = { version = "4.4.1", features = ["secure-cookies"] }
 kube = { version = "0.88.1", features = ["runtime", "derive"] }

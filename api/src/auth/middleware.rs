@@ -74,13 +74,18 @@ where
 
       let token = Token::new(session_cookie.value().to_string());
 
-      let user_id = Session::verify_token(&pool, token).await.map_err(|_| {
+      let mut conn = pool.acquire().await.map_err(|err| {
+        debug!("Error creating connection {}", err);
+        Error::from(ApiError::Unauthorize)
+      })?;
+
+      let user_id = Session::verify_token(&mut conn, token).await.map_err(|_| {
         debug!("Invalid token");
         Error::from(ApiError::Unauthorize)
       })?;
 
       if let Some(_) = req.extensions_mut().insert(user_id) {
-        debug!("app data for user id already exists");
+        debug!("user id already exists");
         return Err(Error::from(ApiError::InternalError));
       }
 

@@ -36,6 +36,12 @@ impl From<database::DbError> for ApiError {
   }
 }
 
+impl From<transaction::Error> for ApiError {
+  fn from(_value: transaction::Error) -> Self {
+    ApiError::InternalError
+  }
+}
+
 impl From<auth::AuthError> for ApiError {
   fn from(value: auth::AuthError) -> Self {
     match value {
