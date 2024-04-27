@@ -1,3 +1,9 @@
+use actix_web::{
+  body::BoxBody,
+  dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
+  Error, HttpMessage,
+};
+use log::debug;
 use std::{
   cell::RefCell,
   future::{ready, Future, Ready},
@@ -6,14 +12,10 @@ use std::{
   sync::Arc,
 };
 
-use actix_web::{
-  body::BoxBody,
-  dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
-  Error, HttpMessage,
-};
-use log::debug;
-
-use crate::{auth::Token, database::Pool, error::ApiError, models::session::Session};
+use crate::auth::Token;
+use crate::database::Pool;
+use crate::error::ApiError;
+use crate::models::session::Session;
 
 pub struct AuthService {
   pool: Arc<Pool>,
@@ -84,7 +86,7 @@ where
         Error::from(ApiError::Unauthorize)
       })?;
 
-      if let Some(_) = req.extensions_mut().insert(user_id) {
+      if req.extensions_mut().insert(user_id).is_some() {
         debug!("user id already exists");
         return Err(Error::from(ApiError::InternalError));
       }

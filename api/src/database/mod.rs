@@ -23,7 +23,7 @@ pub async fn create_pool(database_url: &str, max_connections: u32) -> DbResult<A
   sqlx::migrate!("./migrations")
     .run(&pool)
     .await
-    .map_err(|err| sqlx::Error::from(err))?;
+    .map_err(sqlx::Error::from)?;
 
   Ok(Arc::new(pool))
 }

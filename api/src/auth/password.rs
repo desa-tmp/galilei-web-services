@@ -39,7 +39,7 @@ impl AuthSecurity for Password {
   }
 
   fn verify(&self, hash: &str) -> AuthResult<()> {
-    let parsed_hash = PasswordHash::new(&hash)?;
+    let parsed_hash = PasswordHash::new(hash)?;
 
     let argon2 = Argon2::default();
 
