@@ -25,8 +25,8 @@ impl<DB: Database> LazyTx<DB> {
     Ok(())
   }
 
-  pub fn tx(self) -> Transaction<'static, DB> {
-    self.tx.expect("BUG: lazy transaction not initialized")
+  pub fn tx(self) -> Option<Transaction<'static, DB>> {
+    self.tx
   }
 }
 

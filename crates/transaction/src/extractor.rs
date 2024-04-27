@@ -26,27 +26,19 @@ where
 
   fn take(self) -> Result<Tx<DB>, E> {
     match self.0.steal() {
-      SlotState::Value(v) => Ok(v.tx()),
+      SlotState::Value(v) => Ok(v.tx().expect("BUG: transaction not initialized")),
       _ => Err(E::from(Error::MultipleExtractors)),
     }
   }
 
   pub async fn commit(self) -> Result<(), E> {
-    self
-      .take()?
-      .commit()
-      .await
-      .map_err(|err| Error::from(err))?;
+    self.take()?.commit().await.map_err(Error::from)?;
 
     Ok(())
   }
 
   pub async fn rollback(self) -> Result<(), E> {
-    self
-      .take()?
-      .rollback()
-      .await
-      .map_err(|err| Error::from(err))?;
+    self.take()?.rollback().await.map_err(Error::from)?;
 
     Ok(())
   }
@@ -78,14 +70,15 @@ where
     let req = req.clone();
 
     Box::pin(async move {
-      if let Some(slot) = req.extensions().get::<Slot<LazyTx<DB>>>() {
-        return match slot.take() {
-          SlotState::Value(v) => Ok(Self::create(v).await?),
-          _ => Err(E::from(Error::MultipleExtractors)),
-        };
-      }
+      let slot = req
+        .extensions_mut()
+        .remove::<Slot<LazyTx<DB>>>()
+        .ok_or(E::from(Error::MissingMiddleware))?;
 
-      Err(E::from(Error::MissingMiddleware))
+      match slot.take() {
+        SlotState::Value(v) => Ok(Self::create(v).await?),
+        _ => Err(E::from(Error::MultipleExtractors)),
+      }
     })
   }
 }

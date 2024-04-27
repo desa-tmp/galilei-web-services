@@ -90,22 +90,25 @@ where
 
       let tx = match slot.steal() {
         SlotState::Value(v) => v.tx(),
-        _ => Err(E::from(Error::MultipleExtractors))?,
+        SlotState::Empty => None,
+        SlotState::Locked => Err(E::from(Error::MultipleExtractors))?,
       };
 
-      let tx_res = match response {
-        Ok(ref res) => {
-          let status_code = res.status();
-          if status_code.is_client_error() || status_code.is_server_error() {
-            tx.rollback().await
-          } else {
-            tx.commit().await
+      if let Some(tx) = tx {
+        let tx_res = match response {
+          Ok(ref res) => {
+            let status_code = res.status();
+            if status_code.is_client_error() || status_code.is_server_error() {
+              tx.rollback().await
+            } else {
+              tx.commit().await
+            }
           }
-        }
-        Err(_) => tx.rollback().await,
-      };
+          Err(_) => tx.rollback().await,
+        };
 
-      tx_res.map_err(|err| E::from(Error::Database(err)))?;
+        tx_res.map_err(|err| E::from(Error::Database(err)))?;
+      }
 
       response
     })
