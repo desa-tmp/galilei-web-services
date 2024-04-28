@@ -59,6 +59,9 @@ importers:
       react-resizable-panels:
         specifier: ^2.0.18
         version: 2.0.18(react-dom@18.2.0)(react@18.2.0)
+      set-cookie-parser:
+        specifier: ^2.6.0
+        version: 2.6.0
       tailwind-merge:
         specifier: ^2.2.2
         version: 2.2.2
@@ -78,6 +81,9 @@ importers:
       '@types/react-dom':
         specifier: ^18
         version: 18.2.18
+      '@types/set-cookie-parser':
+        specifier: ^2.4.7
+        version: 2.4.7
       autoprefixer:
         specifier: ^10.0.1
         version: 10.4.16(postcss@8.4.33)
@@ -966,6 +972,12 @@ packages:
 
   /@types/scheduler@0.16.8:
     resolution: {integrity: sha512-WZLiwShhwLRmeV6zH+GkbOFT6Z6VklCItrDioxUnv+u4Ll+8vKeFySoFyK/0ctcRpOmwAicELfmys1sDc/Rw+A==}
+
+  /@types/set-cookie-parser@2.4.7:
+    resolution: {integrity: sha512-+ge/loa0oTozxip6zmhRIk8Z/boU51wl9Q6QdLZcokIGMzY5lFXYy/x7Htj2HTC6/KZP1hUbZ1ekx8DYXICvWg==}
+    dependencies:
+      '@types/node': 20.11.28
+    dev: true
 
   /@typescript-eslint/parser@6.19.0(eslint@8.56.0)(typescript@5.3.3):
     resolution: {integrity: sha512-1DyBLG5SH7PYCd00QlroiW60YJ4rWMuUGa/JBV0iZuqi4l4IK3twKPq5ZkEebmGqRjXWVgsUzfd3+nZveewgow==}
@@ -3176,6 +3188,10 @@ packages:
     dependencies:
       lru-cache: 6.0.0
     dev: true
+
+  /set-cookie-parser@2.6.0:
+    resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==}
+    dev: false
 
   /set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
