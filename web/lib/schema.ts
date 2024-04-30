@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { ZodType, z } from "zod";
 
 export const LoginSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
@@ -22,3 +22,17 @@ export const RegisterSchema = z
   });
 
 export type Register = z.infer<typeof RegisterSchema>;
+
+export interface Galaxy {
+  id: string;
+  name: string;
+  user_id: string;
+}
+
+export type NewGalaxy = Pick<Galaxy, "name">;
+
+export const NewGalaxySchema = z.object({
+  name: z.string().min(1, {
+    message: "Galaxy name is required",
+  }),
+}) satisfies ZodType<NewGalaxy>;
