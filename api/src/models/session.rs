@@ -17,9 +17,6 @@ impl Session {
   pub async fn verify_token(conn: &mut Connection, token: Token) -> DbResult<UserId> {
     let token_hash = token.hash()?;
 
-    log::debug!("token: {:#?}", &token);
-    log::debug!("token_hash: {}", &token_hash);
-
     let row = sqlx::query!(
       "SELECT expires, user_id FROM sessions WHERE token = $1",
       token_hash
@@ -27,11 +24,8 @@ impl Session {
     .fetch_one(conn)
     .await?;
 
-    log::debug!("row: {:#?}", &row);
-
     if let Some(expires) = row.expires {
       if expires.and_utc() < Utc::now() {
-        log::debug!("time expired {} < {}", expires.and_utc(), Utc::now());
         return Err(DbError::NotFound);
       }
     }
