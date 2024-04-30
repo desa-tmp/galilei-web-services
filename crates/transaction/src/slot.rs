@@ -14,7 +14,7 @@ pub enum SlotState<T> {
 pub struct SlotRef<T>(ArcMutexGuard<RawMutex, Option<T>>);
 
 impl<T> SlotRef<T> {
-  pub fn steal(self) -> SlotState<T> {
+  /* pub fn steal(self) -> SlotState<T> {
     match ArcMutexGuard::<RawMutex, Option<T>>::mutex(&self.0).try_lock_arc() {
       Some(mut guard) => match guard.take() {
         Some(v) => SlotState::Value(v),
@@ -22,7 +22,7 @@ impl<T> SlotRef<T> {
       },
       None => SlotState::Locked,
     }
-  }
+  } */
 
   pub fn as_deref(&self) -> &<T as Deref>::Target
   where

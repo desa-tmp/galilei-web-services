@@ -9,7 +9,7 @@ use crate::error::Error;
 use crate::lazy::LazyTx;
 use crate::slot::{Slot, SlotRef, SlotState};
 
-type Tx<DB> = sqlx::Transaction<'static, DB>;
+//type Tx<DB> = sqlx::Transaction<'static, DB>;
 
 pub struct Transaction<DB: Database, E = Error>(SlotRef<LazyTx<DB>>, PhantomData<E>);
 
@@ -24,7 +24,7 @@ where
     Ok(Self(tx, PhantomData::<E>))
   }
 
-  fn take(self) -> Result<Tx<DB>, E> {
+  /* fn take(self) -> Result<Tx<DB>, E> {
     match self.0.steal() {
       SlotState::Value(v) => Ok(v.tx().expect("BUG: transaction not initialized")),
       _ => Err(E::from(Error::MultipleExtractors)),
@@ -41,7 +41,7 @@ where
     self.take()?.rollback().await.map_err(Error::from)?;
 
     Ok(())
-  }
+  } */
 }
 
 impl<DB: Database, E> Deref for Transaction<DB, E> {
