@@ -36,3 +36,43 @@ export const NewGalaxySchema = z.object({
     message: "Galaxy name is required",
   }),
 }) satisfies ZodType<NewGalaxy>;
+
+export interface Star {
+  id: string;
+  name: string;
+  nebula: string;
+  galaxy_id: string;
+}
+
+export type StarData = Pick<Star, "name" | "nebula">;
+
+export const StarDataSchema = z.object({
+  name: z.string().min(1, {
+    message: "Star name is required",
+  }),
+  nebula: z.string().min(1, {
+    message: "Star nebula is required",
+  }),
+}) satisfies ZodType<StarData>;
+
+export interface Planet {
+  id: string;
+  name: string;
+  capacity: number;
+  star_id: string | null;
+  galaxy_id: string;
+}
+
+export type PlanetData = Pick<Planet, "name" | "capacity"> & {
+  star_id: string;
+};
+
+export const PlanetDataSchema = z.object({
+  name: z.string().min(1, {
+    message: "Planet name is required",
+  }),
+  capacity: z.coerce.number().min(0, {
+    message: "Minimum planet capacity is 0",
+  }),
+  star_id: z.string(),
+}) satisfies ZodType<PlanetData>;

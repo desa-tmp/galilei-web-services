@@ -14,14 +14,13 @@ function isSameSite(str: string): str is SameSite {
 interface FetchOptions {
   method?: string;
   body?: unknown;
+  tags?: string[];
 }
 
 export async function fetchApi(
   path: string,
-  { method = "GET", body = null }: FetchOptions = {}
+  { method = "GET", body = null, tags }: FetchOptions = {}
 ): Promise<Response> {
-  console.log(path.startsWith("/") ? path.slice(1) : path);
-
   const res = await fetch(
     `http://127.0.0.1:8080/${path.startsWith("/") ? path.slice(1) : path}`,
     {
@@ -31,6 +30,9 @@ export async function fetchApi(
         Cookie: cookies().toString(),
       },
       body: body ? JSON.stringify(body) : null,
+      next: {
+        tags,
+      },
     }
   );
 

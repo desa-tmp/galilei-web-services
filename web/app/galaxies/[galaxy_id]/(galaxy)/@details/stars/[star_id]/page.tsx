@@ -1,11 +1,19 @@
+import StarForm from "@/components/star-form";
+import { updateStar } from "@/lib/actions";
+import { fetchApi } from "@/lib/api";
+import { Star } from "@/lib/schema";
 import { Page } from "@/lib/types";
 
-type StarPage = Page<{ galaxy_id: string; star_id: string }>;
+type StarPageProps = Page<{ galaxy_id: string; star_id: string }>;
 
-export default function Star({ params: { galaxy_id, star_id } }: StarPage) {
+export default async function StarPage({
+  params: { galaxy_id, star_id },
+}: StarPageProps) {
+  const star = (await (
+    await fetchApi(`/galaxies/${galaxy_id}/stars/${star_id}`)
+  ).json()) as Star;
+
   return (
-    <h1>
-      Star id: {star_id} in galaxy id: {galaxy_id}
-    </h1>
+    <StarForm action={updateStar.bind(null, galaxy_id, star_id)} star={star} />
   );
 }
