@@ -16,7 +16,7 @@ export default async function PlanetPage({
   return (
     <PlanetForm
       action={updatePlanet.bind(null, galaxy_id, planet_id)}
-      planet={planet}
+      planet={{ ...planet, star_id: planet.star_id ?? "" }}
     />
   );
 }
