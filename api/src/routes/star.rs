@@ -17,10 +17,6 @@ use crate::models::star::{
   CreateStarData, CrudOperations, GalaxyPath, Star, StarPath, UpdateStarData,
 };
 
-use super::FromPath;
-
-impl FromPath for StarPath {}
-
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(
   description = "all stars in the galaxy",
@@ -40,9 +36,7 @@ impl_json_responder!(StarsList, StatusCode::OK);
 )]
 #[get("/galaxies/{galaxy_id}/stars")]
 pub async fn get_all_stars(mut tx: Transaction, path: Path<GalaxyPath>) -> ApiResult<StarsList> {
-  let galaxy_id = GalaxyPath::from_path(path);
-
-  let stars = Star::all(&mut tx, galaxy_id).await?;
+  let stars = Star::all(&mut tx, &path).await?;
 
   Ok(StarsList::from(stars))
 }
@@ -77,13 +71,33 @@ pub async fn create_star(
   path: Path<GalaxyPath>,
   Json(data): Json<CreateStarData>,
 ) -> ApiResult<StarCreated> {
-  let galaxy_id = GalaxyPath::from_path(path);
-
   data.validate()?;
 
-  let new_star = Star::create(&mut tx, galaxy_id, data).await?;
+  let new_star = Star::create(&mut tx, &path, data).await?;
 
   Ok(StarCreated::from(new_star))
+}
+
+#[derive(Serialize, From, utoipa::ToResponse)]
+#[response(description = "specific star", content_type = "application/json")]
+pub struct SpecificStar(Star);
+impl_json_responder!(SpecificStar, StatusCode::OK);
+
+#[utoipa::path(
+  params(StarPath),
+  responses(
+    (status = OK, response = SpecificStar),
+    (status = NOT_FOUND, response = NotFoundResponse),
+    (status = CONFLICT, response = AlreadyExistsResponse),
+    (status = BAD_REQUEST, response = ValidationResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  )
+)]
+#[get("/galaxies/{galaxy_id}/stars/{star_id}")]
+pub async fn get_star(mut tx: Transaction, path: Path<StarPath>) -> ApiResult<SpecificStar> {
+  let star = Star::get(&mut tx, &path).await?;
+
+  Ok(SpecificStar::from(star))
 }
 
 #[derive(Serialize, From, utoipa::ToResponse)]
@@ -116,11 +130,9 @@ pub async fn update_star(
   path: Path<StarPath>,
   Json(data): Json<UpdateStarData>,
 ) -> ApiResult<StarUpdated> {
-  let star_id = StarPath::from_path(path);
-
   data.validate()?;
 
-  let updated_star = Star::update(&mut tx, star_id, data).await?;
+  let updated_star = Star::update(&mut tx, &path, data).await?;
 
   Ok(StarUpdated::from(updated_star))
 }
@@ -144,9 +156,7 @@ impl_json_responder!(StarDeleted, StatusCode::OK);
 )]
 #[delete("/galaxies/{galaxy_id}/stars/{star_id}")]
 pub async fn delete_star(mut tx: Transaction, path: Path<StarPath>) -> ApiResult<StarDeleted> {
-  let star_id = StarPath::from_path(path);
-
-  let deleted_star = Star::delete(&mut tx, star_id).await?;
+  let deleted_star = Star::delete(&mut tx, &path).await?;
 
   Ok(StarDeleted::from(deleted_star))
 }
@@ -154,6 +164,7 @@ pub async fn delete_star(mut tx: Transaction, path: Path<StarPath>) -> ApiResult
 pub fn config(cfg: &mut ServiceConfig) {
   cfg
     .service(get_all_stars)
+    .service(get_star)
     .service(create_star)
     .service(update_star)
     .service(delete_star);

@@ -16,12 +16,10 @@ use crate::error::{
 use crate::impl_json_responder;
 use crate::models::{
   galaxy::{CreateGalaxyData, Galaxy, GalaxyPath, UpdateGalaxyData, UserId},
+  planet::Planet,
+  star::Star,
   CrudOperations,
 };
-
-use super::FromPath;
-
-impl FromPath for GalaxyPath {}
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(description = "all user galaxies", content_type = "application/json")]
@@ -41,7 +39,7 @@ pub async fn get_all_galaxies(
   mut tx: Transaction,
   user_id: ReqData<UserId>,
 ) -> ApiResult<GalaxiesList> {
-  let galaxies = Galaxy::all(&mut tx, user_id.into_inner()).await?;
+  let galaxies = Galaxy::all(&mut tx, &user_id).await?;
 
   Ok(GalaxiesList::from(galaxies))
 }
@@ -77,9 +75,44 @@ pub async fn create_galaxy(
 ) -> ApiResult<GalaxyCreated> {
   data.validate()?;
 
-  let new_galaxy = Galaxy::create(&mut tx, user_id.into_inner(), data).await?;
+  let new_galaxy = Galaxy::create(&mut tx, &user_id, data).await?;
 
   Ok(GalaxyCreated::from(new_galaxy))
+}
+
+#[derive(Serialize, utoipa::ToResponse)]
+#[response(
+  description = "specific galaxy with all its stars and planets",
+  content_type = "application/json"
+)]
+pub struct SpecificGalaxy {
+  galaxy: Galaxy,
+  stars: Vec<Star>,
+  planets: Vec<Planet>,
+}
+impl_json_responder!(SpecificGalaxy, StatusCode::OK);
+
+#[utoipa::path(
+  params(GalaxyPath),
+  responses(
+    (status = OK, response = SpecificGalaxy),
+    (status = NOT_FOUND, response = NotFoundResponse),
+    (status = CONFLICT, response = AlreadyExistsResponse),
+    (status = BAD_REQUEST, response = ValidationResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  )
+)]
+#[get("/galaxies/{galaxy_id}")]
+pub async fn get_galaxy(mut tx: Transaction, path: Path<GalaxyPath>) -> ApiResult<SpecificGalaxy> {
+  let galaxy = Galaxy::get(&mut tx, &path).await?;
+  let stars = Star::all(&mut tx, &path).await?;
+  let planets = Planet::all(&mut tx, &path).await?;
+
+  Ok(SpecificGalaxy {
+    galaxy,
+    stars,
+    planets,
+  })
 }
 
 #[derive(Serialize, From, utoipa::ToResponse)]
@@ -112,11 +145,9 @@ pub async fn update_galaxy(
   path: Path<GalaxyPath>,
   Json(data): Json<UpdateGalaxyData>,
 ) -> ApiResult<GalaxyUpdated> {
-  let galaxy_path = GalaxyPath::from_path(path);
-
   data.validate()?;
 
-  let updated_galaxy = Galaxy::update(&mut tx, galaxy_path, data).await?;
+  let updated_galaxy = Galaxy::update(&mut tx, &path, data).await?;
 
   Ok(GalaxyUpdated::from(updated_galaxy))
 }
@@ -143,9 +174,7 @@ pub async fn delete_galaxy(
   mut tx: Transaction,
   path: Path<GalaxyPath>,
 ) -> ApiResult<GalaxyDeleted> {
-  let galaxy_id = GalaxyPath::from_path(path);
-
-  let deleted_galaxy = Galaxy::delete(&mut tx, galaxy_id).await?;
+  let deleted_galaxy = Galaxy::delete(&mut tx, &path).await?;
 
   Ok(GalaxyDeleted::from(deleted_galaxy))
 }
@@ -153,6 +182,7 @@ pub async fn delete_galaxy(
 pub fn config(cfg: &mut ServiceConfig) {
   cfg
     .service(get_all_galaxies)
+    .service(get_galaxy)
     .service(create_galaxy)
     .service(update_galaxy)
     .service(delete_galaxy);

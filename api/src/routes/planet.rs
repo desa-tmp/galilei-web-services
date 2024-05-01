@@ -17,10 +17,6 @@ use crate::models::planet::{
   CreatePlanetData, CrudOperations, GalaxyPath, Planet, PlanetPath, UpdatePlanetData,
 };
 
-use super::FromPath;
-
-impl FromPath for PlanetPath {}
-
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(
   description = "all planets in the galaxy",
@@ -43,9 +39,7 @@ pub async fn get_all_planets(
   mut tx: Transaction,
   path: Path<GalaxyPath>,
 ) -> ApiResult<PlanetsList> {
-  let galaxy_id = GalaxyPath::from_path(path);
-
-  let planets = Planet::all(&mut tx, galaxy_id).await?;
+  let planets = Planet::all(&mut tx, &path).await?;
 
   Ok(PlanetsList::from(planets))
 }
@@ -80,13 +74,33 @@ pub async fn create_planet(
   path: Path<GalaxyPath>,
   Json(data): Json<CreatePlanetData>,
 ) -> ApiResult<PlanetCreated> {
-  let galaxy_id = GalaxyPath::from_path(path);
-
   data.validate()?;
 
-  let new_planet = Planet::create(&mut tx, galaxy_id, data).await?;
+  let new_planet = Planet::create(&mut tx, &path, data).await?;
 
   Ok(PlanetCreated::from(new_planet))
+}
+
+#[derive(Serialize, From, utoipa::ToResponse)]
+#[response(description = "specific planet", content_type = "application/json")]
+pub struct SpecificPlanet(Planet);
+impl_json_responder!(SpecificPlanet, StatusCode::OK);
+
+#[utoipa::path(
+  params(PlanetPath),
+  responses(
+    (status = OK, response = SpecificPlanet),
+    (status = NOT_FOUND, response = NotFoundResponse),
+    (status = CONFLICT, response = AlreadyExistsResponse),
+    (status = BAD_REQUEST, response = ValidationResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  )
+)]
+#[get("/galaxies/{galaxy_id}/planets/{planet_id}")]
+pub async fn get_planet(mut tx: Transaction, path: Path<PlanetPath>) -> ApiResult<SpecificPlanet> {
+  let planet = Planet::get(&mut tx, &path).await?;
+
+  Ok(SpecificPlanet::from(planet))
 }
 
 #[derive(Serialize, From, utoipa::ToResponse)]
@@ -119,11 +133,9 @@ pub async fn update_planet(
   path: Path<PlanetPath>,
   Json(data): Json<UpdatePlanetData>,
 ) -> ApiResult<PlanetUpdated> {
-  let planet_id = PlanetPath::from_path(path);
-
   data.validate()?;
 
-  let updated_planet = Planet::update(&mut tx, planet_id, data).await?;
+  let updated_planet = Planet::update(&mut tx, &path, data).await?;
 
   Ok(PlanetUpdated::from(updated_planet))
 }
@@ -150,9 +162,7 @@ pub async fn delete_planet(
   mut tx: Transaction,
   path: Path<PlanetPath>,
 ) -> ApiResult<PlanetDeleted> {
-  let planet_id = PlanetPath::from_path(path);
-
-  let deleted_planet = Planet::delete(&mut tx, planet_id).await?;
+  let deleted_planet = Planet::delete(&mut tx, &path).await?;
 
   Ok(PlanetDeleted::from(deleted_planet))
 }
@@ -160,6 +170,7 @@ pub async fn delete_planet(
 pub fn config(cfg: &mut ServiceConfig) {
   cfg
     .service(get_all_planets)
+    .service(get_planet)
     .service(create_planet)
     .service(update_planet)
     .service(delete_planet);

@@ -15,9 +15,3 @@ macro_rules! impl_json_responder {
     }
   };
 }
-
-pub trait FromPath: Sized {
-  fn from_path(path: actix_web::web::Path<Self>) -> Self {
-    path.into_inner()
-  }
-}

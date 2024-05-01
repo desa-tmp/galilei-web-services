@@ -42,7 +42,7 @@ impl CrudOperations for Galaxy {
   type CreateData = CreateGalaxyData;
   type UpdateData = UpdateGalaxyData;
 
-  async fn all(conn: &mut Connection, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
+  async fn all(conn: &mut Connection, ident: &Self::OwnerIdent) -> DbResult<Vec<Self>> {
     let UserId(user_id) = ident;
 
     let galaxies = sqlx::query_as!(Galaxy, "SELECT * FROM galaxies WHERE user_id = $1", user_id)
@@ -52,9 +52,19 @@ impl CrudOperations for Galaxy {
     Ok(galaxies)
   }
 
+  async fn get(conn: &mut Connection, ident: &Self::ResourceIdent) -> DbResult<Self> {
+    let GalaxyPath(galaxy_id) = ident;
+
+    let galaxy = sqlx::query_as!(Galaxy, "SELECT * FROM galaxies WHERE id = $1", galaxy_id)
+      .fetch_one(conn)
+      .await?;
+
+    Ok(galaxy)
+  }
+
   async fn create(
     conn: &mut Connection,
-    ident: Self::OwnerIdent,
+    ident: &Self::OwnerIdent,
     data: Self::CreateData,
   ) -> DbResult<Self> {
     let UserId(user_id) = ident;
@@ -74,7 +84,7 @@ impl CrudOperations for Galaxy {
 
   async fn update(
     conn: &mut Connection,
-    ident: Self::ResourceIdent,
+    ident: &Self::ResourceIdent,
     data: Self::UpdateData,
   ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
@@ -92,7 +102,7 @@ impl CrudOperations for Galaxy {
     Ok(updated_user)
   }
 
-  async fn delete(conn: &mut Connection, ident: Self::ResourceIdent) -> DbResult<Self> {
+  async fn delete(conn: &mut Connection, ident: &Self::ResourceIdent) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
 
     let deleted_user = sqlx::query_as!(

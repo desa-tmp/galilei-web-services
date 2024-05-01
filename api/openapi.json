@@ -63,6 +63,40 @@
       }
     },
     "/galaxies/{galaxy_id}": {
+      "get": {
+        "tags": [
+          "routes::galaxy"
+        ],
+        "operationId": "get_galaxy",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SpecificGalaxy"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      },
       "put": {
         "tags": [
           "routes::galaxy"
@@ -213,6 +247,49 @@
       }
     },
     "/galaxies/{galaxy_id}/planets/{planet_id}": {
+      "get": {
+        "tags": [
+          "routes::planet"
+        ],
+        "operationId": "get_planet",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "planet_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SpecificPlanet"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      },
       "put": {
         "tags": [
           "routes::planet"
@@ -381,6 +458,49 @@
       }
     },
     "/galaxies/{galaxy_id}/stars/{star_id}": {
+      "get": {
+        "tags": [
+          "routes::star"
+        ],
+        "operationId": "get_star",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SpecificStar"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      },
       "put": {
         "tags": [
           "routes::star"
@@ -827,6 +947,58 @@
               "items": {
                 "$ref": "#/components/schemas/Planet"
               }
+            }
+          }
+        }
+      },
+      "SpecificGalaxy": {
+        "description": "specific galaxy with all its stars and planets",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "galaxy",
+                "stars",
+                "planets"
+              ],
+              "properties": {
+                "galaxy": {
+                  "$ref": "#/components/schemas/Galaxy"
+                },
+                "planets": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Planet"
+                  }
+                },
+                "stars": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Star"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "SpecificPlanet": {
+        "description": "specific planet",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Planet"
+            }
+          }
+        }
+      },
+      "SpecificStar": {
+        "description": "specific star",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Star"
             }
           }
         }

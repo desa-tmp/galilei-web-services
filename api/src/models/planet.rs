@@ -51,7 +51,7 @@ impl CrudOperations for Planet {
   type CreateData = CreatePlanetData;
   type UpdateData = UpdatePlanetData;
 
-  async fn all(conn: &mut Connection, ident: Self::OwnerIdent) -> DbResult<Vec<Self>> {
+  async fn all(conn: &mut Connection, ident: &Self::OwnerIdent) -> DbResult<Vec<Self>> {
     let GalaxyPath(galaxy_id) = ident;
 
     let galaxies = sqlx::query_as!(
@@ -65,9 +65,24 @@ impl CrudOperations for Planet {
     Ok(galaxies)
   }
 
+  async fn get(conn: &mut Connection, ident: &Self::ResourceIdent) -> DbResult<Self> {
+    let PlanetPath(galaxy_id, planet_id) = ident;
+
+    let planet = sqlx::query_as!(
+      Planet,
+      "SELECT * FROM planets WHERE galaxy_id = $1 AND id = $2",
+      galaxy_id,
+      planet_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(planet)
+  }
+
   async fn create(
     conn: &mut Connection,
-    ident: Self::OwnerIdent,
+    ident: &Self::OwnerIdent,
     data: Self::CreateData,
   ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
@@ -92,7 +107,7 @@ impl CrudOperations for Planet {
   }
   async fn update(
     conn: &mut Connection,
-    ident: Self::ResourceIdent,
+    ident: &Self::ResourceIdent,
     data: Self::UpdateData,
   ) -> DbResult<Self> {
     let PlanetPath(galaxy_id, planet_id) = ident;
@@ -128,7 +143,7 @@ impl CrudOperations for Planet {
     Ok(updated_galaxy)
   }
 
-  async fn delete(conn: &mut Connection, ident: Self::ResourceIdent) -> DbResult<Self> {
+  async fn delete(conn: &mut Connection, ident: &Self::ResourceIdent) -> DbResult<Self> {
     let PlanetPath(galaxy_id, planet_id) = ident;
 
     let deleted_galaxy = sqlx::query_as!(
