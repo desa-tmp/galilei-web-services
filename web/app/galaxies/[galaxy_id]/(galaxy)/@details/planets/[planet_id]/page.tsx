@@ -1,7 +1,7 @@
 import PlanetForm from "@/components/planet-form";
 import { updatePlanet } from "@/lib/actions";
 import { fetchApi } from "@/lib/api";
-import { Planet } from "@/lib/schema";
+import { Planet, Star } from "@/lib/schema";
 import { Page } from "@/lib/types";
 
 type PlanetPageProps = Page<{ galaxy_id: string; planet_id: string }>;
@@ -13,9 +13,14 @@ export default async function PlanetPage({
     await fetchApi(`/galaxies/${galaxy_id}/planets/${planet_id}`)
   ).json()) as Planet;
 
+  const stars = (await (
+    await fetchApi(`/galaxies/${galaxy_id}/stars`)
+  ).json()) as Star[];
+
   return (
     <PlanetForm
       action={updatePlanet.bind(null, galaxy_id, planet_id)}
+      stars={stars}
       planet={{ ...planet, star_id: planet.star_id ?? "" }}
     />
   );
