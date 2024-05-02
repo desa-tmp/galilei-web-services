@@ -1,11 +1,7 @@
 "use client";
 
 import { Layout } from "@/lib/types";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/components/ui/resizable";
+import { Resizable } from "@/components/ui/resizable";
 import { useSelectedLayoutSegment } from "next/navigation";
 
 export default function GalaxyLayout({ children, details }: Layout<"details">) {
@@ -13,23 +9,23 @@ export default function GalaxyLayout({ children, details }: Layout<"details">) {
   const galaxyPanelDefaultSize = segment === "children" ? 40 : 100;
 
   return (
-    <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel
+    <Resizable direction="horizontal">
+      <Resizable.Panel
         id="galaxy"
         minSize={30}
         defaultSize={galaxyPanelDefaultSize}
         order={1}
       >
         {children}
-      </ResizablePanel>
+      </Resizable.Panel>
       {segment === "children" && (
         <>
-          <ResizableHandle withHandle />
-          <ResizablePanel id="details" minSize={30} defaultSize={60} order={2}>
+          <Resizable.Handle withHandle />
+          <Resizable.Panel id="details" minSize={30} defaultSize={60} order={2}>
             {details}
-          </ResizablePanel>
+          </Resizable.Panel>
         </>
       )}
-    </ResizablePanelGroup>
+    </Resizable>
   );
 }

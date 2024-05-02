@@ -48,4 +48,4 @@ const Resizable = Object.assign(ResizablePanelGroup, {
   Handle: ResizableHandle,
 });
 
-export { Resizable, ResizablePanelGroup, ResizablePanel, ResizableHandle };
+export { Resizable };
