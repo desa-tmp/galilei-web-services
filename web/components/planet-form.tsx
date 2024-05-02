@@ -98,7 +98,11 @@ export default function PlanetForm({ action, stars, planet }: PlanetFormProps) {
             </Form.Item>
           )}
         />
-        <Button type="submit" className="w-full">
+        <Button
+          type="submit"
+          className="w-full"
+          loading={form.formState.isSubmitting}
+        >
           Submit
         </Button>
       </form>

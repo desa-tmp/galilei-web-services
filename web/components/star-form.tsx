@@ -57,7 +57,11 @@ export default function StarForm({ action, star }: StarFormProps) {
             </Form.Item>
           )}
         />
-        <Button type="submit" className="w-full">
+        <Button
+          type="submit"
+          className="w-full"
+          loading={form.formState.isSubmitting}
+        >
           Submit
         </Button>
       </form>
