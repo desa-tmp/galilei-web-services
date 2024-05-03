@@ -1,7 +1,7 @@
 use chrono::{NaiveDateTime, Utc};
 use uuid::Uuid;
 
-use crate::auth::{AuthSecurity, Token};
+use crate::auth::{AuthError, AuthSecurity, Token};
 use crate::database::{Connection, DbError, DbResult};
 
 use super::galaxy::UserId;
@@ -21,16 +21,21 @@ impl Session {
       "SELECT expires, user_id FROM sessions WHERE token = $1",
       token_hash
     )
-    .fetch_one(conn)
+    .fetch_optional(conn)
     .await?;
+    
+    match row {
+      Some(row) => {
+        if let Some(expires) = row.expires {
+          if expires.and_utc() < Utc::now() {
+            return Err(DbError::Auth(AuthError::Invalid));
+          }
+        }
 
-    if let Some(expires) = row.expires {
-      if expires.and_utc() < Utc::now() {
-        return Err(DbError::NotFound);
+        Ok(UserId::from(row.user_id))
       }
+      None => Err(DbError::Auth(AuthError::Invalid)),
     }
-
-    Ok(UserId::from(row.user_id))
   }
 
   pub async fn create(
