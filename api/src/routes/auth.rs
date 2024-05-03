@@ -1,20 +1,20 @@
 use actix_web::{
   cookie::{time::OffsetDateTime, Cookie},
-  post,
-  web::{Json, ServiceConfig},
-  HttpResponse, Responder,
+  get, post,
+  web::{self, Json, ServiceConfig},
+  HttpRequest, HttpResponse, Responder,
 };
 use chrono::{Days, NaiveDateTime, Utc};
 use serde::Deserialize;
 use validator::Validate;
 
-use crate::auth::Token;
 use crate::database::{DbResult, Transaction};
 use crate::error::ApiResult;
 use crate::models::{
   session::Session,
   user::{Credentials, User},
 };
+use crate::{auth::Token, error::ApiError};
 
 #[derive(Debug)]
 struct AuthResponse {
@@ -118,6 +118,21 @@ pub async fn login(
   Ok(AuthResponse::session(tx, remember, user).await?)
 }
 
+#[get("/verify")]
+pub async fn verify(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResponse> {
+  if let Some(cookie) = req.cookie("session") {
+    let _ = Session::verify_token(&mut tx, Token::new(cookie.value().to_string())).await?;
+    return Ok(HttpResponse::NoContent().finish());
+  }
+
+  Err(ApiError::Unauthorize)
+}
+
 pub fn config(cfg: &mut ServiceConfig) {
-  cfg.service(register).service(login);
+  cfg.service(
+    web::scope("/auth")
+      .service(register)
+      .service(login)
+      .service(verify),
+  );
 }
