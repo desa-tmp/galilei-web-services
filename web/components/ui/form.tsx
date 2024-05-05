@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
-const FormRoot = FormProvider;
+const Form = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -29,15 +29,13 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-    ...props
-  }: ControllerProps<TFieldValues, TName>) => {
-  return (
-    <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller {...props} />
-    </FormFieldContext.Provider>
-  );
-};
+>(
+  props: ControllerProps<TFieldValues, TName>
+) => (
+  <FormFieldContext.Provider value={{ name: props.name }}>
+    <Controller {...props} />
+  </FormFieldContext.Provider>
+);
 
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
@@ -165,13 +163,13 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
-const Form = Object.assign(FormRoot, {
-  Item: FormItem,
-  Label: FormLabel,
-  Control: FormControl,
-  Description: FormDescription,
-  Message: FormMessage,
-  Field: FormField,
-});
-
-export { Form, useFormField };
+export {
+  Form,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  FormField,
+  useFormField,
+};

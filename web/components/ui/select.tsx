@@ -6,7 +6,7 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const SelectRoot = SelectPrimitive.Root;
+const Select = SelectPrimitive.Root;
 
 const SelectGroup = SelectPrimitive.Group;
 
@@ -146,16 +146,15 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-const Select = Object.assign(SelectRoot, {
-  Group: SelectGroup,
-  Value: SelectValue,
-  Trigger: SelectTrigger,
-  Content: SelectContent,
-  Label: SelectLabel,
-  Item: SelectItem,
-  Separator: SelectSeparator,
-  ScrollUpButton: SelectScrollUpButton,
-  ScrollDownButton: SelectScrollDownButton,
-});
-
-export { Select };
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+};

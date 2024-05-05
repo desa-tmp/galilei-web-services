@@ -1,7 +1,14 @@
 "use client";
 
 import { StarData, StarDataSchema } from "@/lib/schema";
-import { Form } from "./ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
@@ -31,30 +38,30 @@ export default function StarForm({ action, star }: StarFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Form.Field
+        <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Name</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
-        <Form.Field
+        <FormField
           control={form.control}
           name="nebula"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Nebula</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Nebula</FormLabel>
+              <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button

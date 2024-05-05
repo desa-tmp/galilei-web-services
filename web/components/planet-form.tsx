@@ -1,12 +1,27 @@
 "use client";
 
 import { PlanetData, PlanetDataSchema, Star } from "@/lib/schema";
-import { Form } from "./ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Select } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 interface PlanetFormProps {
   // eslint-disable-next-line no-unused-vars
@@ -39,63 +54,63 @@ export default function PlanetForm({ action, stars, planet }: PlanetFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Form.Field
+        <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Name</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
-        <Form.Field
+        <FormField
           control={form.control}
           name="capacity"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Capacity</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Capacity</FormLabel>
+              <FormControl>
                 <Input type="number" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
-        <Form.Field
+        <FormField
           control={form.control}
           name="star_id"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Star</Form.Label>
+            <FormItem>
+              <FormLabel>Star</FormLabel>
               <Select
                 onValueChange={field.onChange}
                 value={
                   field.value === DISCONNECTED_VALUE ? undefined : field.value
                 }
               >
-                <Form.Control>
-                  <Select.Trigger>
-                    <Select.Value placeholder="Select a star to connect planet with" />
-                  </Select.Trigger>
-                </Form.Control>
-                <Select.Content>
-                  <Select.Item value={DISCONNECTED_VALUE}>No one</Select.Item>
-                  <Select.Group>
-                    <Select.Label>Stars</Select.Label>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a star to connect planet with" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={DISCONNECTED_VALUE}>No one</SelectItem>
+                  <SelectGroup>
+                    <SelectLabel>Stars</SelectLabel>
                     {stars.map(({ id, name }) => (
-                      <Select.Item key={id} value={id}>
+                      <SelectItem key={id} value={id}>
                         {name}
-                      </Select.Item>
+                      </SelectItem>
                     ))}
-                  </Select.Group>
-                </Select.Content>
+                  </SelectGroup>
+                </SelectContent>
               </Select>
-              <Form.Message />
-            </Form.Item>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button

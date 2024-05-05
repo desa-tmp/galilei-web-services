@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,61 +34,61 @@ export default function RegisterPage() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Form.Field
+        <FormField
           control={form.control}
           name="username"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Username</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
-        <Form.Field
+        <FormField
           control={form.control}
           name="password"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Password</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
                 <Input type="password" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
-        <Form.Field
+        <FormField
           control={form.control}
           name="confirm"
           render={({ field }) => (
-            <Form.Item>
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control>
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
                 <Input type="password" autoComplete="off" {...field} />
-              </Form.Control>
-              <Form.Message />
-            </Form.Item>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
-        <Form.Field
+        <FormField
           control={form.control}
           name="remember"
           render={({ field }) => (
-            <Form.Item>
+            <FormItem>
               <div className="flex items-center gap-2">
-                <Form.Control>
+                <FormControl>
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                </Form.Control>
-                <Form.Label>Remember me</Form.Label>
+                </FormControl>
+                <FormLabel>Remember me</FormLabel>
               </div>
-              <Form.Message />
-            </Form.Item>
+              <FormMessage />
+            </FormItem>
           )}
         />
         <Button
