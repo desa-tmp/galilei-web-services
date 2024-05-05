@@ -8,19 +8,48 @@ import { cn } from "@/lib/utils";
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="size-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+>(({ className, children, ...props }, ref) => {
+  const [overflowOn, setOverflowOn] = React.useState<
+    "top" | "bottom" | "both" | null
+  >(null);
+
+  const onScroll = React.useCallback((e: React.UIEvent<HTMLElement>) => {
+    const { scrollHeight, scrollTop, clientHeight } = e.currentTarget;
+
+    if (scrollHeight <= clientHeight) {
+      setOverflowOn(null);
+    } else if (scrollTop === 0) {
+      setOverflowOn("bottom");
+    } else if (Math.abs(scrollHeight - clientHeight - scrollTop) <= 1) {
+      setOverflowOn("top");
+    } else {
+      setOverflowOn("both");
+    }
+  }, []);
+
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative overflow-hidden border-y-2 border-transparent transition-colors",
+        overflowOn === "top" && "border-t-border",
+        overflowOn === "both" && "border-y-border",
+        overflowOn === "bottom" && "border-b-border",
+        className
+      )}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        className="size-full rounded-[inherit]"
+        onScroll={onScroll}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+});
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<

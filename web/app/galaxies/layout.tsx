@@ -1,9 +1,23 @@
+import { Button } from "@/components/ui/button";
 import { Layout } from "@/lib/types";
+import { Orbit } from "lucide-react";
+import Link from "next/link";
 
 export default function GalaxiesLayout({ children }: Layout) {
   return (
-    <div className="flex size-full flex-col items-center justify-center px-12 py-9">
-      {children}
+    <div className="flex size-full flex-col">
+      <header className="flex w-full items-center justify-between gap-6 border-b-2 border-border px-6 py-2">
+        <Link href="/galaxies" className="font-bold">
+          GWS
+        </Link>
+        <Button className="flex items-center gap-2" asChild>
+          <Link href="/galaxies/new">
+            <span>new</span>
+            <Orbit className="size-4" />
+          </Link>
+        </Button>
+      </header>
+      <main className="flex-1 overflow-hidden">{children}</main>
     </div>
   );
 }

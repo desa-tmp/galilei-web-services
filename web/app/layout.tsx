@@ -18,7 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "size-full")}>{children}</body>
+      <body className={cn(inter.className, "w-screen h-screen")}>
+        {children}
+      </body>
     </html>
   );
 }
