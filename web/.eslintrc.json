@@ -5,16 +5,5 @@
     "plugin:tailwindcss/recommended",
     "eslint-config-next",
     "eslint-config-prettier"
-  ],
-  "rules": {
-    "indent": [
-      "error",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "quotes": ["error", "double", { "avoidEscape": true }],
-    "semi": ["error", "always"]
-  }
+  ]
 }
