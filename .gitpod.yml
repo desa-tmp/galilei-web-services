@@ -1,0 +1,25 @@
+tasks:
+  - init: docker compose build
+    command: docker compose up
+  - init: cargo build
+    command: |
+      gp ports await 5432
+      cargo run
+  - init: pnpm i
+    command: |
+      gp ports await 8080
+      pnpm dev
+
+ports:
+  - name: Postgres DB
+    description: The postgres database
+    port: 5432
+    onOpen: notify
+  - name: Api
+    description: The api server
+    port: 8080
+    onOpen: notify
+  - name: Web App
+    description: The main application web server
+    port: 3000
+    onOpen: open-browser
