@@ -1,6 +1,6 @@
 use actix_web::{
   cookie::{time::OffsetDateTime, Cookie},
-  get, post,
+  delete, get, post,
   web::{self, Json, ServiceConfig},
   HttpRequest, HttpResponse, Responder,
 };
@@ -128,11 +128,21 @@ pub async fn verify(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResp
   Err(ApiError::Unauthorize)
 }
 
+#[delete("/logout")]
+pub async fn logout(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResponse> {
+  if let Some(cookie) = req.cookie("session") {
+    Session::delete(&mut tx, Token::new(cookie.value().to_string())).await?;
+  }
+
+  Ok(HttpResponse::NoContent().finish())
+}
+
 pub fn config(cfg: &mut ServiceConfig) {
   cfg.service(
     web::scope("/auth")
       .service(register)
       .service(login)
-      .service(verify),
+      .service(verify)
+      .service(logout),
   );
 }

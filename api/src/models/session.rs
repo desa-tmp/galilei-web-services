@@ -23,7 +23,7 @@ impl Session {
     )
     .fetch_optional(conn)
     .await?;
-    
+
     match row {
       Some(row) => {
         if let Some(expires) = row.expires {
@@ -57,5 +57,15 @@ impl Session {
     .await?;
 
     Ok(session)
+  }
+
+  pub async fn delete(conn: &mut Connection, token: Token) -> DbResult<()> {
+    let token_hash = token.hash()?;
+
+    let _ = sqlx::query!("DELETE FROM sessions WHERE token = $1", token_hash)
+      .fetch_optional(conn)
+      .await?;
+
+    Ok(())
   }
 }
