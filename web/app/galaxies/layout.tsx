@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import UserAvatar from "@/components/UserAvatar";
 import { Layout } from "@/lib/types";
 import { Orbit } from "lucide-react";
 import Link from "next/link";
@@ -10,12 +11,15 @@ export default function GalaxiesLayout({ children }: Layout) {
         <Link href="/galaxies" className="font-bold">
           GWS
         </Link>
-        <Button className="flex items-center gap-2" asChild>
-          <Link href="/galaxies/new">
-            <span>new</span>
-            <Orbit className="size-4" />
-          </Link>
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button className="flex items-center gap-2" asChild>
+            <Link href="/galaxies/new">
+              <span>new</span>
+              <Orbit className="size-4" />
+            </Link>
+          </Button>
+          <UserAvatar />
+        </div>
       </header>
       <div className="flex-1 overflow-hidden">{children}</div>
     </div>

@@ -23,6 +23,11 @@ export const RegisterSchema = z
 
 export type Register = z.infer<typeof RegisterSchema>;
 
+export interface User {
+  id: string;
+  name: string;
+}
+
 export interface Galaxy {
   id: string;
   name: string;
