@@ -1,7 +1,7 @@
 import { fetchApi } from "@/lib/api";
 import { Galaxy as GalaxyType, Planet, Star } from "@/lib/schema";
 import Resource from "./resource";
-import { Earth, Plus, Star as StarIcon } from "lucide-react";
+import { Earth, Orbit, Plus, Star as StarIcon } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -22,7 +22,10 @@ export default async function Galaxy({ galaxy_id }: GalaxyProps) {
   return (
     <main className="flex flex-col gap-4 px-4 py-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{galaxy.name}</h1>
+        <div className="flex items-center gap-4">
+          <Orbit />
+          <h1 className="text-2xl font-bold">{galaxy.name}</h1>
+        </div>
         <div className="flex items-center gap-4">
           <Button className="flex gap-2" asChild>
             <Link href={`/galaxies/${galaxy.id}/stars/new`}>
