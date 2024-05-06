@@ -1,0 +1,49 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO planets(name, capacity, star_id, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "capacity",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "star_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "galaxy_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "5493a98fa2e3402a9759e3917a3b06220f1916eea819fdd86450274db4d838f7"
+}

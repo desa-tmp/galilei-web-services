@@ -1,0 +1,51 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n      UPDATE planets\n      SET name = COALESCE($1, name),\n        capacity = COALESCE($2, capacity),\n        star_id = (CASE WHEN $3 = true THEN $4 ELSE star_id END)\n      WHERE galaxy_id = $5 AND id = $6\n      RETURNING *\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "capacity",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "star_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "galaxy_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4",
+        "Bool",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "96ad3a90815d8defa06bd555d97b9bf1dfe49a6d364b59aa75932df8e8d56711"
+}

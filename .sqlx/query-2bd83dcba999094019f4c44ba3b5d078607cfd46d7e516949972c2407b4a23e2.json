@@ -1,0 +1,47 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM planets WHERE galaxy_id = $1 AND id = $2 RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "capacity",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "star_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "galaxy_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "2bd83dcba999094019f4c44ba3b5d078607cfd46d7e516949972c2407b4a23e2"
+}
