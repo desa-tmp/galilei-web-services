@@ -20,7 +20,7 @@ export default async function Galaxies() {
         </Button>
       </header>
       <ScrollArea className="flex-1" type="auto">
-        <ul className="grid grid-cols-3 gap-x-4 gap-y-6 p-4">
+        <ul className="grid grid-cols-fluid gap-x-4 gap-y-6 p-4">
           {galaxies.map(({ id, name }) => (
             <li
               key={id}
