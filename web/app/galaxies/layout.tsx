@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import UserAvatar from "@/components/UserAvatar";
+import UserAvatar from "@/components/user-avatar";
 import { Layout } from "@/lib/types";
 import { Orbit } from "lucide-react";
 import Link from "next/link";
