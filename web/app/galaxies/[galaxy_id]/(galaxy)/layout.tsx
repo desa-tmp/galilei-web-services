@@ -10,7 +10,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 
 export default function GalaxyLayout({ children, details }: Layout<"details">) {
   const segment = useSelectedLayoutSegment("details");
-  const galaxyPanelDefaultSize = segment === "children" ? 40 : 100;
+  const galaxyPanelDefaultSize = segment === "children" ? 60 : 100;
 
   return (
     <ResizablePanelGroup direction="horizontal">
@@ -25,7 +25,7 @@ export default function GalaxyLayout({ children, details }: Layout<"details">) {
       {segment === "children" && (
         <>
           <ResizableHandle withHandle />
-          <ResizablePanel id="details" minSize={30} defaultSize={60} order={2}>
+          <ResizablePanel id="details" minSize={30} defaultSize={40} order={2}>
             {details}
           </ResizablePanel>
         </>

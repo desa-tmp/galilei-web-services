@@ -17,7 +17,7 @@ export default function GalaxiesLayout({ children }: Layout) {
           </Link>
         </Button>
       </header>
-      <main className="flex-1 overflow-hidden">{children}</main>
+      <div className="flex-1 overflow-hidden">{children}</div>
     </div>
   );
 }

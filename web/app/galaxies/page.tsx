@@ -1,3 +1,4 @@
+import Resource from "@/components/resource";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { fetchApi } from "@/lib/api";
@@ -22,17 +23,11 @@ export default async function Galaxies() {
       <ScrollArea className="flex-1" type="auto">
         <ul className="grid grid-cols-fluid gap-x-4 gap-y-6 p-4">
           {galaxies.map(({ id, name }) => (
-            <li
-              key={id}
-              className="w-full cursor-pointer overflow-hidden rounded-md border border-border transition-colors hover:bg-secondary/80"
-            >
-              <Link
-                href={`/galaxies/${id}`}
-                className="flex size-full items-center gap-2 px-6 py-4"
-              >
+            <li key={id} className="w-full">
+              <Resource href={`/galaxies/${id}`}>
                 <Orbit />
                 <span>{name}</span>
-              </Link>
+              </Resource>
             </li>
           ))}
         </ul>
