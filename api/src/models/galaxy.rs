@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use derive_more::From;
+use derive_more::{Deref, From};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
@@ -28,7 +28,7 @@ gen_update_data! {
   }
 }
 
-#[derive(Debug, From, Deserialize, Clone)]
+#[derive(Debug, From, Deserialize, Clone, Deref)]
 pub struct UserId(Uuid);
 
 #[derive(Debug, From, Deserialize, IntoParams)]

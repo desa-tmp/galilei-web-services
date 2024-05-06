@@ -2,6 +2,7 @@ pub mod auth;
 pub mod galaxy;
 pub mod planet;
 pub mod star;
+pub mod user;
 
 #[macro_export]
 macro_rules! impl_json_responder {

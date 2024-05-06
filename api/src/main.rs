@@ -31,6 +31,7 @@ async fn main() -> std::io::Result<()> {
       .service(
         web::scope("")
           .wrap(AuthService::new(Arc::clone(&pool)))
+          .configure(api::routes::user::config)
           .configure(api::routes::galaxy::config)
           .configure(api::routes::star::config)
           .configure(api::routes::planet::config),
