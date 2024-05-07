@@ -9,7 +9,6 @@ use serde::Serialize;
 
 use validator::Validate;
 
-use crate::database::Transaction;
 use crate::error::{
   AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
 };
@@ -20,6 +19,7 @@ use crate::models::{
   star::Star,
   CrudOperations,
 };
+use crate::{database::Transaction, error::UnauthorizeResponse};
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(description = "all user galaxies", content_type = "application/json")]
@@ -31,6 +31,7 @@ impl_json_responder!(GalaxiesList, StatusCode::OK);
   responses(
     (status = OK, response = GalaxiesList),
     (status = NOT_FOUND, response = NotFoundResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -64,6 +65,7 @@ impl_json_responder!(GalaxyCreated, StatusCode::CREATED);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -99,6 +101,7 @@ impl_json_responder!(SpecificGalaxy, StatusCode::OK);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -136,6 +139,7 @@ impl_json_responder!(GalaxyUpdated, StatusCode::OK);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -166,6 +170,7 @@ impl_json_responder!(GalaxyDeleted, StatusCode::OK);
   responses(
     (status = OK, response = GalaxyDeleted),
     (status = NOT_FOUND, response = NotFoundResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]

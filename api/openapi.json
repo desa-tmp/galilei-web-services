@@ -19,6 +19,9 @@
           "200": {
             "$ref": "#/components/responses/GalaxiesList"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -49,6 +52,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -85,6 +91,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -131,6 +140,9 @@
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -162,6 +174,9 @@
           "200": {
             "$ref": "#/components/responses/GalaxyDeleted"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -191,6 +206,9 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/PlanetsList"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -233,6 +251,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -278,6 +299,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -333,6 +357,9 @@
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -373,6 +400,9 @@
           "200": {
             "$ref": "#/components/responses/PlanetDeleted"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -402,6 +432,9 @@
         "responses": {
           "200": {
             "$ref": "#/components/responses/StarsList"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -444,6 +477,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -489,6 +525,9 @@
           },
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
           },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
@@ -544,6 +583,9 @@
           "400": {
             "$ref": "#/components/responses/ValidationResponse"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -584,6 +626,141 @@
           "200": {
             "$ref": "#/components/responses/StarDeleted"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "description": "login data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AuthResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/logout": {
+      "delete": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "description": "registration data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AuthResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "routes::user"
+        ],
+        "operationId": "me",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UserResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
+    "/verify": {
+      "get": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "verify",
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
           "404": {
             "$ref": "#/components/responses/NotFoundResponse"
           },
@@ -596,6 +773,24 @@
   },
   "components": {
     "schemas": {
+      "AuthData": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Credentials"
+          },
+          {
+            "type": "object",
+            "required": [
+              "remember"
+            ],
+            "properties": {
+              "remember": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
       "ConnectPlanetToStar": {
         "type": "object",
         "properties": {
@@ -658,6 +853,24 @@
           }
         }
       },
+      "Credentials": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Password"
+          },
+          {
+            "type": "object",
+            "required": [
+              "username"
+            ],
+            "properties": {
+              "username": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "Galaxy": {
         "type": "object",
         "required": [
@@ -677,6 +890,17 @@
           "user_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "Password": {
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "properties": {
+          "password": {
+            "type": "string"
           }
         }
       },
@@ -790,6 +1014,22 @@
             "nullable": true
           }
         }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
       }
     },
     "responses": {
@@ -811,6 +1051,32 @@
                   "type": "integer",
                   "format": "int32",
                   "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "AuthResponse": {
+        "description": "user authorized from session token",
+        "headers": {
+          "Set-Cookie": {
+            "schema": {
+              "type": "string"
+            },
+            "description": "The session ID is returned in a cookie named `session`. You need to include this cookie in subsequent requests."
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "user"
+              ],
+              "properties": {
+                "user": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
@@ -1046,6 +1312,40 @@
           }
         }
       },
+      "UnauthorizeResponse": {
+        "description": "User not authorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "status_code",
+                "message"
+              ],
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "status_code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserResponse": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
       "ValidationResponse": {
         "description": "The body of the request contains incorrect data",
         "content": {
@@ -1070,6 +1370,18 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "session_token": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "session_token": []
+    }
+  ]
 }

@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
 
 use crate::auth::{AuthSecurity, Password};
 use crate::database::{Connection, DbResult};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct User {
   pub id: Uuid,
   pub name: String,
@@ -13,7 +14,7 @@ pub struct User {
   pub password: String,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct Credentials {
   #[validate(length(min = 1, message = "cannot be empty"))]
   username: String,

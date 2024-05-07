@@ -5,21 +5,36 @@ use actix_web::{
   HttpRequest, HttpResponse, Responder,
 };
 use chrono::{Days, NaiveDateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::database::{DbResult, Transaction};
-use crate::error::ApiResult;
+use crate::error::{
+  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+};
 use crate::models::{
   session::Session,
   user::{Credentials, User},
 };
 use crate::{auth::Token, error::ApiError};
+use crate::{
+  database::{DbResult, Transaction},
+  error::UnauthorizeResponse,
+};
 
-#[derive(Debug)]
-struct AuthResponse {
+#[derive(Serialize, Debug, utoipa::ToResponse)]
+#[response(
+  description = "user authorized from session token",
+  content_type = "application/json",
+  headers(
+    ("Set-Cookie" = String, description = "The session ID is returned in a cookie named `session`. You need to include this cookie in subsequent requests.")
+  )
+)]
+#[serde(transparent)]
+pub struct AuthResponse {
   user: User,
+  #[serde(skip)]
   expires: Option<OffsetDateTime>,
+  #[serde(skip)]
   token: Token,
 }
 
@@ -75,14 +90,30 @@ impl Responder for AuthResponse {
   }
 }
 
-#[derive(Debug, Deserialize, Validate)]
-struct AuthData {
+#[derive(Debug, Deserialize, Validate, utoipa::ToSchema)]
+pub struct AuthData {
   #[serde(flatten)]
   #[validate(nested)]
   credentials: Credentials,
   remember: bool,
 }
 
+#[utoipa::path(
+  request_body(
+    content = AuthData,
+    description = "registration data",
+    content_type = "application/json"
+  ),
+  responses(
+    (status = OK, response = AuthResponse),
+    (status = CONFLICT, response = AlreadyExistsResponse),
+    (status = BAD_REQUEST, response = ValidationResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  ),
+  security(
+    () // security is not required
+  )
+)]
 #[post("/register")]
 pub async fn register(
   mut tx: Transaction,
@@ -100,6 +131,22 @@ pub async fn register(
   Ok(AuthResponse::session(tx, remember, new_user).await?)
 }
 
+#[utoipa::path(
+  request_body(
+    content = AuthData,
+    description = "login data",
+    content_type = "application/json"
+  ),
+  responses(
+    (status = OK, response = AuthResponse),
+    (status = CONFLICT, response = AlreadyExistsResponse),
+    (status = BAD_REQUEST, response = ValidationResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  ),
+  security(
+    () // security is not required
+  )
+)]
 #[post("/login")]
 pub async fn login(
   mut tx: Transaction,
@@ -118,6 +165,14 @@ pub async fn login(
   Ok(AuthResponse::session(tx, remember, user).await?)
 }
 
+#[utoipa::path(
+  responses(
+    (status = NO_CONTENT),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
+    (status = NOT_FOUND, response = NotFoundResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  )
+)]
 #[get("/verify")]
 pub async fn verify(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResponse> {
   if let Some(cookie) = req.cookie("session") {
@@ -128,6 +183,13 @@ pub async fn verify(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResp
   Err(ApiError::Unauthorize)
 }
 
+#[utoipa::path(
+  responses(
+    (status = NO_CONTENT),
+    (status = NOT_FOUND, response = NotFoundResponse),
+    (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
+  )
+)]
 #[delete("/logout")]
 pub async fn logout(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResponse> {
   if let Some(cookie) = req.cookie("session") {

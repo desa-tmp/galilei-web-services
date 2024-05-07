@@ -8,7 +8,6 @@ use derive_more::From;
 use serde::Serialize;
 use validator::Validate;
 
-use crate::database::Transaction;
 use crate::error::{
   AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
 };
@@ -16,6 +15,7 @@ use crate::impl_json_responder;
 use crate::models::planet::{
   CreatePlanetData, CrudOperations, GalaxyPath, Planet, PlanetPath, UpdatePlanetData,
 };
+use crate::{database::Transaction, error::UnauthorizeResponse};
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(
@@ -31,6 +31,7 @@ impl_json_responder!(PlanetsList, StatusCode::OK);
   responses(
     (status = OK, response = PlanetsList),
     (status = NOT_FOUND, response = NotFoundResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -65,6 +66,7 @@ impl_json_responder!(PlanetCreated, StatusCode::CREATED);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -93,6 +95,7 @@ impl_json_responder!(SpecificPlanet, StatusCode::OK);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -124,6 +127,7 @@ impl_json_responder!(PlanetUpdated, StatusCode::OK);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -154,6 +158,7 @@ impl_json_responder!(PlanetDeleted, StatusCode::OK);
   responses(
     (status = OK, response = PlanetDeleted),
     (status = NOT_FOUND, response = NotFoundResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]

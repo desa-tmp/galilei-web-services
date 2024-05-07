@@ -8,7 +8,6 @@ use derive_more::From;
 use serde::Serialize;
 use validator::Validate;
 
-use crate::database::Transaction;
 use crate::error::{
   AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
 };
@@ -16,6 +15,7 @@ use crate::impl_json_responder;
 use crate::models::star::{
   CreateStarData, CrudOperations, GalaxyPath, Star, StarPath, UpdateStarData,
 };
+use crate::{database::Transaction, error::UnauthorizeResponse};
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(
@@ -31,6 +31,7 @@ impl_json_responder!(StarsList, StatusCode::OK);
   responses(
     (status = OK, response = StarsList),
     (status = NOT_FOUND, response = NotFoundResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -62,6 +63,7 @@ impl_json_responder!(StarCreated, StatusCode::CREATED);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -90,6 +92,7 @@ impl_json_responder!(SpecificStar, StatusCode::OK);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -121,6 +124,7 @@ impl_json_responder!(StarUpdated, StatusCode::OK);
     (status = NOT_FOUND, response = NotFoundResponse),
     (status = CONFLICT, response = AlreadyExistsResponse),
     (status = BAD_REQUEST, response = ValidationResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
@@ -151,6 +155,7 @@ impl_json_responder!(StarDeleted, StatusCode::OK);
   responses(
     (status = OK, response = StarDeleted),
     (status = NOT_FOUND, response = NotFoundResponse),
+    (status = UNAUTHORIZED, response = UnauthorizeResponse),
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]

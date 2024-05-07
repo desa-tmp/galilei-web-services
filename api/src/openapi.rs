@@ -1,9 +1,33 @@
-use crate::{error, models, routes};
-use utoipa::OpenApi;
+use crate::{auth, error, models, routes};
+use utoipa::{
+  openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
+  Modify, OpenApi,
+};
 
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+  fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+    if let Some(schema) = openapi.components.as_mut() {
+      schema.add_security_scheme(
+        "session_token",
+        SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new("session"))),
+      );
+    }
+  }
+}
 #[derive(OpenApi)]
 #[openapi(
+  modifiers(&SecurityAddon),
+  security(
+    ("session_token" = [])
+  ),
   paths(
+    routes::auth::register,
+    routes::auth::login,
+    routes::auth::verify,
+    routes::auth::logout,
+    routes::user::me,
     routes::galaxy::get_all_galaxies,
     routes::galaxy::get_galaxy,
     routes::galaxy::create_galaxy,
@@ -22,6 +46,10 @@ use utoipa::OpenApi;
   ),
   components(
     schemas(
+      routes::auth::AuthData,
+      models::user::User,
+      auth::Password,
+      models::user::Credentials,
       models::galaxy::Galaxy,
       models::galaxy::CreateGalaxyData,
       models::galaxy::UpdateGalaxyData,
@@ -34,10 +62,13 @@ use utoipa::OpenApi;
       models::planet::UpdatePlanetData,
     ),
     responses(
+      error::UnauthorizeResponse,
       error::NotFoundResponse,
       error::AlreadyExistsResponse,
       error::ValidationResponse,
       error::InternalErrorResponse,
+      routes::auth::AuthResponse,
+      routes::user::UserResponse,
       routes::galaxy::GalaxiesList,
       routes::galaxy::SpecificGalaxy,
       routes::galaxy::GalaxyCreated,

@@ -5,11 +5,12 @@ use argon2::{
   Argon2,
 };
 use serde::Deserialize;
+use utoipa::ToSchema;
 use validator::Validate;
 
 use super::{AuthError, AuthResult, AuthSecurity};
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct Password {
   #[serde(rename = "password")]
   #[validate(length(min = 1, message = "cannot be empty"))]
