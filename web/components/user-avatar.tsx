@@ -1,5 +1,4 @@
-import { fetchApi } from "@/lib/api";
-import { User } from "@/lib/schema";
+import { api } from "@/lib/api";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -12,15 +11,24 @@ import {
 import { DoorOpen } from "lucide-react";
 import ActionClick from "./action-click";
 import { redirect } from "next/navigation";
+import { ApiError } from "api-client";
 
 export default async function UserAvatar() {
-  const user = (await (await fetchApi("/users/me")).json()) as User;
+  const { data: user, error } = await api.GET("/users/me");
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   async function logout() {
     "use server";
-    await fetchApi("/auth/logout", {
+    const { error } = await api.DELETE("/auth/logout", {
       method: "DELETE",
     });
+
+    if (error) {
+      throw new ApiError(error);
+    }
 
     redirect("/login");
   }

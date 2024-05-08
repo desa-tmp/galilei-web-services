@@ -1,23 +1,25 @@
-import { fetchApi } from "@/lib/api";
-import { Galaxy as GalaxyType, Planet, Star } from "@/lib/schema";
+import { api } from "@/lib/api";
 import Resource from "./resource";
 import { Earth, Orbit, Plus, Star as StarIcon } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { ApiError } from "api-client";
 
 interface GalaxyProps {
   galaxy_id: string;
 }
 
 export default async function Galaxy({ galaxy_id }: GalaxyProps) {
-  const { galaxy, stars, planets } = (await (
-    await fetchApi(`/galaxies/${galaxy_id}`, { tags: ["galaxy"] })
-  ).json()) as {
-    galaxy: GalaxyType;
-    stars: Star[];
-    planets: Planet[];
-  };
+  const { data, error } = await api.GET("/galaxies/{galaxy_id}", {
+    params: { path: { galaxy_id } },
+  });
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  const { galaxy, stars, planets } = data;
 
   return (
     <main className="flex flex-col gap-4 px-4 py-6">

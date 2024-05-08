@@ -1,8 +1,8 @@
 import StarForm from "@/components/star-form";
 import { updateStar } from "@/lib/actions";
-import { fetchApi } from "@/lib/api";
-import { Star } from "@/lib/schema";
+import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
+import { ApiError } from "api-client";
 import { Star as StarIcon } from "lucide-react";
 
 type StarPageProps = Page<{ galaxy_id: string; star_id: string }>;
@@ -10,9 +10,16 @@ type StarPageProps = Page<{ galaxy_id: string; star_id: string }>;
 export default async function StarPage({
   params: { galaxy_id, star_id },
 }: StarPageProps) {
-  const star = (await (
-    await fetchApi(`/galaxies/${galaxy_id}/stars/${star_id}`)
-  ).json()) as Star;
+  const { data: star, error } = await api.GET(
+    "/galaxies/{galaxy_id}/stars/{star_id}",
+    {
+      params: { path: { galaxy_id, star_id } },
+    }
+  );
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   return (
     <div className="size-full">

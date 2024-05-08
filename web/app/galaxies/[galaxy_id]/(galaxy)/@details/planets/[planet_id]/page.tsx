@@ -1,8 +1,8 @@
 import PlanetForm from "@/components/planet-form";
 import { updatePlanet } from "@/lib/actions";
-import { fetchApi } from "@/lib/api";
-import { Planet, Star } from "@/lib/schema";
+import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
+import { ApiError } from "api-client";
 import { Earth } from "lucide-react";
 
 type PlanetPageProps = Page<{ galaxy_id: string; planet_id: string }>;
@@ -10,13 +10,27 @@ type PlanetPageProps = Page<{ galaxy_id: string; planet_id: string }>;
 export default async function PlanetPage({
   params: { galaxy_id, planet_id },
 }: PlanetPageProps) {
-  const planet = (await (
-    await fetchApi(`/galaxies/${galaxy_id}/planets/${planet_id}`)
-  ).json()) as Planet;
+  const { data: planet, error: planetError } = await api.GET(
+    "/galaxies/{galaxy_id}/planets/{planet_id}",
+    {
+      params: { path: { galaxy_id, planet_id } },
+    }
+  );
 
-  const stars = (await (
-    await fetchApi(`/galaxies/${galaxy_id}/stars`)
-  ).json()) as Star[];
+  if (planetError) {
+    throw new ApiError(planetError);
+  }
+
+  const { data: stars, error: starsError } = await api.GET(
+    "/galaxies/{galaxy_id}/stars",
+    {
+      params: { path: { galaxy_id } },
+    }
+  );
+
+  if (starsError) {
+    throw new ApiError(starsError);
+  }
 
   return (
     <div className="size-full">

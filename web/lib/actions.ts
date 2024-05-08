@@ -1,68 +1,73 @@
 "use server";
 
 import {
-  Galaxy,
   Login,
   LoginSchema,
   NewGalaxy,
   NewGalaxySchema,
-  Planet,
   PlanetData,
   PlanetDataSchema,
   Register,
   RegisterSchema,
-  Star,
   StarData,
   StarDataSchema,
 } from "./schema";
-import { fetchApi } from "./api";
+import { api } from "./api";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { ApiError } from "api-client";
 
 export async function login(data: Login) {
-  const login_data = LoginSchema.parse(data);
+  const loginData = LoginSchema.parse(data);
 
-  await fetchApi("/auth/login", {
-    method: "POST",
-    body: login_data,
-  });
+  const { error } = await api.POST("/auth/login", { body: loginData });
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   redirect("/galaxies");
 }
 
 export async function register(data: Register) {
-  const register_data = RegisterSchema.parse(data);
+  const registerData = RegisterSchema.parse(data);
 
-  await fetchApi("/auth/register", {
-    method: "POST",
-    body: register_data,
-  });
+  const { error } = await api.POST("/auth/register", { body: registerData });
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   redirect("/galaxies");
 }
 
 export async function newGalaxy(data: NewGalaxy) {
-  const new_galaxy = NewGalaxySchema.parse(data);
+  const newGalaxy = NewGalaxySchema.parse(data);
 
-  const res = await fetchApi("/galaxies", {
-    method: "POST",
-    body: new_galaxy,
+  const { error, data: galaxy } = await api.POST("/galaxies", {
+    body: newGalaxy,
   });
 
-  const galaxy: Galaxy = await res.json();
+  if (error) {
+    throw new ApiError(error);
+  }
 
   redirect(`/galaxies/${galaxy.id}`);
 }
 
 export async function newStar(galaxyId: string, data: StarData) {
-  const star_data = StarDataSchema.parse(data);
+  const starData = StarDataSchema.parse(data);
 
-  const res = await fetchApi(`/galaxies/${galaxyId}/stars`, {
-    method: "POST",
-    body: star_data,
+  const { error, data: star } = await api.POST("/galaxies/{galaxy_id}/stars", {
+    params: {
+      path: { galaxy_id: galaxyId },
+    },
+    body: starData,
   });
 
-  const star: Star = await res.json();
+  if (error) {
+    throw new ApiError(error);
+  }
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${star.galaxy_id}/stars/${star.id}`);
@@ -73,12 +78,18 @@ export async function updateStar(
   starId: string,
   data: StarData
 ) {
-  const star_data = StarDataSchema.parse(data);
+  const starData = StarDataSchema.parse(data);
 
-  await fetchApi(`/galaxies/${galaxyId}/stars/${starId}`, {
-    method: "PUT",
-    body: star_data,
+  const { error } = await api.PUT("/galaxies/{galaxy_id}/stars/{star_id}", {
+    params: {
+      path: { galaxy_id: galaxyId, star_id: starId },
+    },
+    body: starData,
   });
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   revalidateTag("galaxy");
 }
@@ -86,12 +97,19 @@ export async function updateStar(
 export async function newPlanet(galaxyId: string, data: PlanetData) {
   const { star_id, ...rest } = PlanetDataSchema.parse(data);
 
-  const res = await fetchApi(`/galaxies/${galaxyId}/planets`, {
-    method: "POST",
-    body: { ...rest, star: { id: star_id.length === 0 ? null : star_id } },
-  });
+  const { error, data: planet } = await api.POST(
+    "/galaxies/{galaxy_id}/planets",
+    {
+      params: {
+        path: { galaxy_id: galaxyId },
+      },
+      body: { ...rest, star: { id: star_id.length === 0 ? null : star_id } },
+    }
+  );
 
-  const planet: Planet = await res.json();
+  if (error) {
+    throw new ApiError(error);
+  }
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${planet.galaxy_id}/planets/${planet.id}`);
@@ -104,10 +122,16 @@ export async function updatePlanet(
 ) {
   const { star_id, ...rest } = PlanetDataSchema.parse(data);
 
-  await fetchApi(`/galaxies/${galaxyId}/planets/${planetId}`, {
-    method: "PUT",
+  const { error } = await api.PUT("/galaxies/{galaxy_id}/planets/{planet_id}", {
+    params: {
+      path: { galaxy_id: galaxyId, planet_id: planetId },
+    },
     body: { ...rest, star: { id: star_id.length === 0 ? null : star_id } },
   });
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   revalidateTag("galaxy");
 }

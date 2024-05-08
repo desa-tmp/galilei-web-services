@@ -1,12 +1,15 @@
 import { ZodType, z } from "zod";
+import { components } from "api-client";
+
+export type Login = components["schemas"]["AuthData"];
 
 export const LoginSchema = z.object({
   username: z.string().min(1, { message: "Username is required" }),
   password: z.string().min(1, { message: "Password is required" }),
   remember: z.boolean(),
-});
+}) satisfies ZodType<Login>;
 
-export type Login = z.infer<typeof LoginSchema>;
+export type Register = components["schemas"]["AuthData"] & { confirm: string };
 
 export const RegisterSchema = z
   .object({
@@ -19,22 +22,13 @@ export const RegisterSchema = z
   .refine((data) => data.password === data.confirm, {
     message: "Passwords don't match",
     path: ["confirm"],
-  });
+  }) satisfies ZodType<Register>;
 
-export type Register = z.infer<typeof RegisterSchema>;
+export type User = components["schemas"]["User"];
 
-export interface User {
-  id: string;
-  name: string;
-}
+export type Galaxy = components["schemas"]["Galaxy"];
 
-export interface Galaxy {
-  id: string;
-  name: string;
-  user_id: string;
-}
-
-export type NewGalaxy = Pick<Galaxy, "name">;
+export type NewGalaxy = components["schemas"]["CreateGalaxyData"];
 
 export const NewGalaxySchema = z.object({
   name: z.string().min(1, {
@@ -42,14 +36,9 @@ export const NewGalaxySchema = z.object({
   }),
 }) satisfies ZodType<NewGalaxy>;
 
-export interface Star {
-  id: string;
-  name: string;
-  nebula: string;
-  galaxy_id: string;
-}
+export type Star = components["schemas"]["Star"];
 
-export type StarData = Pick<Star, "name" | "nebula">;
+export type StarData = components["schemas"]["CreateStarData"];
 
 export const StarDataSchema = z.object({
   name: z.string().min(1, {
@@ -60,15 +49,12 @@ export const StarDataSchema = z.object({
   }),
 }) satisfies ZodType<StarData>;
 
-export interface Planet {
-  id: string;
-  name: string;
-  capacity: number;
-  star_id: string | null;
-  galaxy_id: string;
-}
+export type Planet = components["schemas"]["Planet"];
 
-export type PlanetData = Pick<Planet, "name" | "capacity"> & {
+export type PlanetData = Omit<
+  components["schemas"]["CreatePlanetData"],
+  "star"
+> & {
   star_id: string;
 };
 

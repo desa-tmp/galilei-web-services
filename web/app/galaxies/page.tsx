@@ -1,13 +1,17 @@
 import Resource from "@/components/resource";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { fetchApi } from "@/lib/api";
-import { Galaxy } from "@/lib/schema";
+import { api } from "@/lib/api";
+import { ApiError } from "api-client";
 import { Orbit, Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function Galaxies() {
-  const galaxies = (await (await fetchApi("/galaxies")).json()) as Galaxy[];
+  const { data: galaxies, error } = await api.GET("/galaxies");
+
+  if (error) {
+    throw new ApiError(error);
+  }
 
   return (
     <div className="flex size-full flex-col gap-6 px-12 pb-9 pt-12">

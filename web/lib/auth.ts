@@ -1,9 +1,7 @@
-import { fetchApi } from "@/lib/api";
-
-const UNAUTHORIZED_STATUS_CODE = 401;
+import { api } from "@/lib/api";
 
 export async function is_authorized(): Promise<boolean> {
-  const res = await fetchApi("/auth/verify");
+  const { error } = await api.GET("/auth/verify");
 
-  return res.status !== UNAUTHORIZED_STATUS_CODE;
+  return error == undefined;
 }
