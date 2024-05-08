@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import Resource from "./resource";
-import { Earth, Orbit, Plus, Star as StarIcon } from "lucide-react";
+import { Earth, Orbit, Plus, Star as StarIcon, Settings } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -13,6 +13,7 @@ interface GalaxyProps {
 export default async function Galaxy({ galaxy_id }: GalaxyProps) {
   const { data, error } = await api.GET("/galaxies/{galaxy_id}", {
     params: { path: { galaxy_id } },
+    next: { tags: ["galaxy"] },
   });
 
   if (error) {
@@ -39,6 +40,11 @@ export default async function Galaxy({ galaxy_id }: GalaxyProps) {
             <Link href={`/galaxies/${galaxy.id}/planets/new`}>
               <Plus className="size-4" />
               <span>New Planet</span>
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" asChild>
+            <Link href={`/galaxies/${galaxy.id}/settings`}>
+              <Settings />
             </Link>
           </Button>
         </div>

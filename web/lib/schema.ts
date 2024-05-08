@@ -28,13 +28,13 @@ export type User = components["schemas"]["User"];
 
 export type Galaxy = components["schemas"]["Galaxy"];
 
-export type NewGalaxy = components["schemas"]["CreateGalaxyData"];
+export type GalaxyData = components["schemas"]["CreateGalaxyData"];
 
-export const NewGalaxySchema = z.object({
+export const GalaxyDataSchema = z.object({
   name: z.string().min(1, {
     message: "Galaxy name is required",
   }),
-}) satisfies ZodType<NewGalaxy>;
+}) satisfies ZodType<GalaxyData>;
 
 export type Star = components["schemas"]["Star"];
 

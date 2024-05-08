@@ -3,8 +3,8 @@
 import {
   Login,
   LoginSchema,
-  NewGalaxy,
-  NewGalaxySchema,
+  GalaxyData,
+  GalaxyDataSchema,
   PlanetData,
   PlanetDataSchema,
   Register,
@@ -41,11 +41,26 @@ export async function register(data: Register) {
   redirect("/galaxies");
 }
 
-export async function newGalaxy(data: NewGalaxy) {
-  const newGalaxy = NewGalaxySchema.parse(data);
+export async function newGalaxy(data: GalaxyData) {
+  const galaxyData = GalaxyDataSchema.parse(data);
 
   const { error, data: galaxy } = await api.POST("/galaxies", {
-    body: newGalaxy,
+    body: galaxyData,
+  });
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  redirect(`/galaxies/${galaxy.id}`);
+}
+
+export async function updateGalaxy(galaxy_id: string, data: GalaxyData) {
+  const galaxyData = GalaxyDataSchema.parse(data);
+
+  const { error, data: galaxy } = await api.PUT("/galaxies/{galaxy_id}", {
+    params: { path: { galaxy_id } },
+    body: galaxyData,
   });
 
   if (error) {
