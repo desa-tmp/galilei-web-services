@@ -9,6 +9,119 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "description": "login data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AuthResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/auth/logout": {
+      "delete": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "description": "registration data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/AuthResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/auth/verify": {
+      "get": {
+        "tags": [
+          "routes::auth"
+        ],
+        "operationId": "verify",
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
     "/galaxies": {
       "get": {
         "tags": [
@@ -638,97 +751,6 @@
         }
       }
     },
-    "/login": {
-      "post": {
-        "tags": [
-          "routes::auth"
-        ],
-        "operationId": "login",
-        "requestBody": {
-          "description": "login data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/AuthResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationResponse"
-          },
-          "409": {
-            "$ref": "#/components/responses/AlreadyExistsResponse"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalErrorResponse"
-          }
-        },
-        "security": [
-          {}
-        ]
-      }
-    },
-    "/logout": {
-      "delete": {
-        "tags": [
-          "routes::auth"
-        ],
-        "operationId": "logout",
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundResponse"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalErrorResponse"
-          }
-        }
-      }
-    },
-    "/register": {
-      "post": {
-        "tags": [
-          "routes::auth"
-        ],
-        "operationId": "register",
-        "requestBody": {
-          "description": "registration data",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthData"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/AuthResponse"
-          },
-          "400": {
-            "$ref": "#/components/responses/ValidationResponse"
-          },
-          "409": {
-            "$ref": "#/components/responses/AlreadyExistsResponse"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalErrorResponse"
-          }
-        },
-        "security": [
-          {}
-        ]
-      }
-    },
     "/users/me": {
       "get": {
         "tags": [
@@ -741,28 +763,6 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizeResponse"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalErrorResponse"
-          }
-        }
-      }
-    },
-    "/verify": {
-      "get": {
-        "tags": [
-          "routes::auth"
-        ],
-        "operationId": "verify",
-        "responses": {
-          "204": {
-            "description": ""
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizeResponse"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundResponse"
           },
           "500": {
             "$ref": "#/components/responses/InternalErrorResponse"

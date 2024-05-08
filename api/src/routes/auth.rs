@@ -1,7 +1,7 @@
 use actix_web::{
   cookie::{time::OffsetDateTime, Cookie},
   delete, get, post,
-  web::{self, Json, ServiceConfig},
+  web::{Json, ServiceConfig},
   HttpRequest, HttpResponse, Responder,
 };
 use chrono::{Days, NaiveDateTime, Utc};
@@ -114,7 +114,7 @@ pub struct AuthData {
     () // security is not required
   )
 )]
-#[post("/register")]
+#[post("/auth/register")]
 pub async fn register(
   mut tx: Transaction,
   Json(auth_data): Json<AuthData>,
@@ -147,7 +147,7 @@ pub async fn register(
     () // security is not required
   )
 )]
-#[post("/login")]
+#[post("/auth/login")]
 pub async fn login(
   mut tx: Transaction,
   Json(auth_data): Json<AuthData>,
@@ -173,7 +173,7 @@ pub async fn login(
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
-#[get("/verify")]
+#[get("/auth/verify")]
 pub async fn verify(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResponse> {
   if let Some(cookie) = req.cookie("session") {
     let _ = Session::verify_token(&mut tx, Token::new(cookie.value().to_string())).await?;
@@ -190,7 +190,7 @@ pub async fn verify(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResp
     (status = INTERNAL_SERVER_ERROR, response = InternalErrorResponse)
   )
 )]
-#[delete("/logout")]
+#[delete("/auth/logout")]
 pub async fn logout(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResponse> {
   if let Some(cookie) = req.cookie("session") {
     Session::delete(&mut tx, Token::new(cookie.value().to_string())).await?;
@@ -200,11 +200,9 @@ pub async fn logout(mut tx: Transaction, req: HttpRequest) -> ApiResult<HttpResp
 }
 
 pub fn config(cfg: &mut ServiceConfig) {
-  cfg.service(
-    web::scope("/auth")
-      .service(register)
-      .service(login)
-      .service(verify)
-      .service(logout),
-  );
+  cfg
+    .service(register)
+    .service(login)
+    .service(verify)
+    .service(logout);
 }
