@@ -46,6 +46,7 @@ impl Modify for SecurityAddon {
   ),
   components(
     schemas(
+      error::ErrorMessage,
       routes::auth::AuthData,
       models::user::User,
       auth::Password,

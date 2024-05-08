@@ -871,6 +871,23 @@
           }
         ]
       },
+      "ErrorMessage": {
+        "type": "object",
+        "required": [
+          "status_code",
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status_code": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
       "Galaxy": {
         "type": "object",
         "required": [
@@ -1038,21 +1055,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "required": [
-                "status_code",
-                "message"
-              ],
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "status_code": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                }
-              }
+              "$ref": "#/components/schemas/ErrorMessage"
             }
           }
         }
@@ -1131,21 +1134,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "required": [
-                "status_code",
-                "message"
-              ],
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "status_code": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                }
-              }
+              "$ref": "#/components/schemas/ErrorMessage"
             }
           }
         }
@@ -1155,21 +1144,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "required": [
-                "status_code",
-                "message"
-              ],
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "status_code": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                }
-              }
+              "$ref": "#/components/schemas/ErrorMessage"
             }
           }
         }
@@ -1317,21 +1292,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "required": [
-                "status_code",
-                "message"
-              ],
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "status_code": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                }
-              }
+              "$ref": "#/components/schemas/ErrorMessage"
             }
           }
         }
@@ -1351,21 +1312,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "type": "object",
-              "required": [
-                "status_code",
-                "message"
-              ],
-              "properties": {
-                "message": {
-                  "type": "string"
-                },
-                "status_code": {
-                  "type": "integer",
-                  "format": "int32",
-                  "minimum": 0
-                }
-              }
+              "$ref": "#/components/schemas/ErrorMessage"
             }
           }
         }

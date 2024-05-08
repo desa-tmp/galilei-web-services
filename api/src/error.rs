@@ -57,7 +57,7 @@ impl ResponseError for ApiError {
 
     HttpResponse::build(status_code)
       .append_header(header::ContentType::json())
-      .json(ErrorResponse {
+      .json(ErrorMessage {
         status_code: status_code.as_u16(),
         message: self.to_string(),
       })
@@ -75,39 +75,39 @@ impl ResponseError for ApiError {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct ErrorResponse {
+pub struct ErrorMessage {
   status_code: u16,
   message: String,
 }
 
 #[derive(ToResponse)]
 #[response(description = "User not authorized", content_type = "application/json")]
-pub struct UnauthorizeResponse(#[to_schema] ErrorResponse);
+pub struct UnauthorizeResponse(ErrorMessage);
 
 #[derive(ToResponse)]
 #[response(
   description = "Requested resources not found",
   content_type = "application/json"
 )]
-pub struct NotFoundResponse(#[to_schema] ErrorResponse);
+pub struct NotFoundResponse(ErrorMessage);
 
 #[derive(ToResponse)]
 #[response(
   description = "The resource already exists",
   content_type = "application/json"
 )]
-pub struct AlreadyExistsResponse(#[to_schema] ErrorResponse);
+pub struct AlreadyExistsResponse(ErrorMessage);
 
 #[derive(ToResponse)]
 #[response(
   description = "The body of the request contains incorrect data",
   content_type = "application/json"
 )]
-pub struct ValidationResponse(#[to_schema] ErrorResponse);
+pub struct ValidationResponse(ErrorMessage);
 
 #[derive(ToResponse)]
 #[response(
   description = "An internal error occurred",
   content_type = "application/json"
 )]
-pub struct InternalErrorResponse(#[to_schema] ErrorResponse);
+pub struct InternalErrorResponse(ErrorMessage);
