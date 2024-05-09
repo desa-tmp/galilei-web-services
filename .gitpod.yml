@@ -11,10 +11,10 @@ tasks:
     init: |
       gp sync-await docker
       sudo docker cp k3s-server-1:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+    command: kubectl version
   - name: Create default env file
-    init: |
-      cp .env.example .env
-      gp sync-done env
+    init: cp .env.example .env
+    command: gp sync-done env
   - name: Enable offline api build
     init: cargo install sqlx-cli
     command: |
