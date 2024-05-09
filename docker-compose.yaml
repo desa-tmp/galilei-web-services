@@ -1,6 +1,14 @@
 version: "3.5"
 
 services:
+  k3s:
+    container_name: k3s-server-1
+    image: rancher/k3s:v1.24.10-k3s1
+    hostname: "k3s-server-1"
+    privileged: true
+    command: server
+    ports:
+      - "6443:6443" 
   postgres:
     container_name: postgres
     image: postgres
@@ -12,7 +20,7 @@ services:
     volumes:
       - postgres:/data/postgres
     ports:
-      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+      - "${POSTGRES_PORT:-5555}:${POSTGRES_PORT:-5555}"
     networks:
       - postgres
     restart: unless-stopped

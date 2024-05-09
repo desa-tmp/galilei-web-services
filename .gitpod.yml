@@ -1,21 +1,46 @@
+image:
+  file: .gitpod.Dockerfile
+
 tasks:
-  - init: docker compose build
-    command: docker compose up -d
-  - init: cargo install sqlx-cli
-    command: cargo sqlx prepare --workspace
-  - init: cargo build
+  - name: Kubernetes and Postgres
+    init: docker compose build
     command: |
-      gp ports await 5432
+      docker compose up -d
+      gp sync-done docker
+  - name: Copy cluster config from k3s container
+    init: |
+      gp sync-await docker
+      sudo docker cp k3s-server-1:/etc/rancher/k3s/k3s.yaml ~/.kube/config
+  - name: Create default env file
+    init: |
+      cp .env.example .env
+      gp sync-done env
+  - name: Enable offline api build
+    init: cargo install sqlx-cli
+    command: |
+      gp sync-await env
+      cargo sqlx prepare --workspace
+  - name: Api server
+    init: |
+      gp sync-await env
+      cargo build
+    command: |
+      gp sync-await docker
       cargo run
-  - init: pnpm i
+  - name: Web server
+    init: pnpm i
     command: |
       gp ports await 8080
       pnpm dev
 
 ports:
+  - name: k3s
+    description: k3s server port
+    port: 6443
+    onOpen: 
   - name: Postgres DB
     description: The postgres database
-    port: 5432
+    port: 5555
     onOpen: notify
   - name: Api
     description: The api server
