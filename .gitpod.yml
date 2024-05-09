@@ -37,7 +37,7 @@ ports:
   - name: k3s
     description: k3s server port
     port: 6443
-    onOpen: 
+    onOpen: ignore
   - name: Postgres DB
     description: The postgres database
     port: 5555
