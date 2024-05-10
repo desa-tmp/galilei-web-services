@@ -72,7 +72,7 @@ impl CrudOperations for Star {
   async fn create(
     conn: &mut Connection,
     ident: &Self::OwnerIdent,
-    data: Self::CreateData,
+    data: &Self::CreateData,
   ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
     let CreateStarData { name, nebula } = data;
@@ -92,7 +92,7 @@ impl CrudOperations for Star {
   async fn update(
     conn: &mut Connection,
     ident: &Self::ResourceIdent,
-    data: Self::UpdateData,
+    data: &Self::UpdateData,
   ) -> DbResult<Self> {
     let StarPath(galaxy_id, star_id) = ident;
     let UpdateStarData { name, nebula } = data;
@@ -106,8 +106,8 @@ impl CrudOperations for Star {
       WHERE galaxy_id = $3 AND id = $4
       RETURNING *
     "#,
-      name,
-      nebula,
+      name.as_deref(),
+      nebula.as_deref(),
       galaxy_id,
       star_id
     )

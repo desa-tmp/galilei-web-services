@@ -83,7 +83,7 @@ impl CrudOperations for Planet {
   async fn create(
     conn: &mut Connection,
     ident: &Self::OwnerIdent,
-    data: Self::CreateData,
+    data: &Self::CreateData,
   ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
     let CreatePlanetData {
@@ -108,7 +108,7 @@ impl CrudOperations for Planet {
   async fn update(
     conn: &mut Connection,
     ident: &Self::ResourceIdent,
-    data: Self::UpdateData,
+    data: &Self::UpdateData,
   ) -> DbResult<Self> {
     let PlanetPath(galaxy_id, planet_id) = ident;
     let UpdatePlanetData {
@@ -118,7 +118,7 @@ impl CrudOperations for Planet {
     } = data;
 
     let update_star = star.is_some();
-    let star_id = star.map(|con| con.id).unwrap_or(None);
+    let star_id = star.as_ref().map(|con| con.id).unwrap_or(None);
 
     let updated_galaxy = sqlx::query_as!(
       Planet,
@@ -130,8 +130,8 @@ impl CrudOperations for Planet {
       WHERE galaxy_id = $5 AND id = $6
       RETURNING *
     "#,
-      name,
-      capacity,
+      name.as_deref(),
+      capacity.as_ref(),
       update_star,
       star_id,
       galaxy_id,

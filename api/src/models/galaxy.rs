@@ -24,7 +24,7 @@ gen_update_data! {
   pub struct CreateGalaxyData {
     #[schema(min_length = 1)]
     #[validate(length(min = 1, message = "cannot be empty"))]
-    name: String,
+    pub name: String,
   }
 }
 
@@ -65,7 +65,7 @@ impl CrudOperations for Galaxy {
   async fn create(
     conn: &mut Connection,
     ident: &Self::OwnerIdent,
-    data: Self::CreateData,
+    data: &Self::CreateData,
   ) -> DbResult<Self> {
     let UserId(user_id) = ident;
     let CreateGalaxyData { name } = data;
@@ -85,7 +85,7 @@ impl CrudOperations for Galaxy {
   async fn update(
     conn: &mut Connection,
     ident: &Self::ResourceIdent,
-    data: Self::UpdateData,
+    data: &Self::UpdateData,
   ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
     let UpdateGalaxyData { name } = data;
@@ -93,7 +93,7 @@ impl CrudOperations for Galaxy {
     let updated_user = sqlx::query_as!(
       Galaxy,
       "UPDATE galaxies SET name = COALESCE($1, name) WHERE id = $2 RETURNING *",
-      name,
+      name.as_deref(),
       galaxy_id
     )
     .fetch_one(conn)

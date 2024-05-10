@@ -75,7 +75,7 @@ pub async fn create_star(
 ) -> ApiResult<StarCreated> {
   data.validate()?;
 
-  let new_star = Star::create(&mut tx, &path, data).await?;
+  let new_star = Star::create(&mut tx, &path, &data).await?;
 
   Ok(StarCreated::from(new_star))
 }
@@ -136,7 +136,7 @@ pub async fn update_star(
 ) -> ApiResult<StarUpdated> {
   data.validate()?;
 
-  let updated_star = Star::update(&mut tx, &path, data).await?;
+  let updated_star = Star::update(&mut tx, &path, &data).await?;
 
   Ok(StarUpdated::from(updated_star))
 }

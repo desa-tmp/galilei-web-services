@@ -26,7 +26,7 @@ pub trait CrudOperations: Sized {
   async fn create(
     _conn: &mut Connection,
     _ident: &Self::OwnerIdent,
-    _data: Self::CreateData,
+    _data: &Self::CreateData,
   ) -> DbResult<Self> {
     Err(DbError::OperationNotImplemented(Operation::Create))
   }
@@ -34,7 +34,7 @@ pub trait CrudOperations: Sized {
   async fn update(
     _conn: &mut Connection,
     _ident: &Self::ResourceIdent,
-    _data: Self::UpdateData,
+    _data: &Self::UpdateData,
   ) -> DbResult<Self> {
     Err(DbError::OperationNotImplemented(Operation::Update))
   }

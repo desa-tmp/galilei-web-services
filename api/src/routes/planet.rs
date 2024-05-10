@@ -78,7 +78,7 @@ pub async fn create_planet(
 ) -> ApiResult<PlanetCreated> {
   data.validate()?;
 
-  let new_planet = Planet::create(&mut tx, &path, data).await?;
+  let new_planet = Planet::create(&mut tx, &path, &data).await?;
 
   Ok(PlanetCreated::from(new_planet))
 }
@@ -139,7 +139,7 @@ pub async fn update_planet(
 ) -> ApiResult<PlanetUpdated> {
   data.validate()?;
 
-  let updated_planet = Planet::update(&mut tx, &path, data).await?;
+  let updated_planet = Planet::update(&mut tx, &path, &data).await?;
 
   Ok(PlanetUpdated::from(updated_planet))
 }

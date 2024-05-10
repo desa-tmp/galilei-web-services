@@ -51,6 +51,12 @@ impl From<auth::AuthError> for ApiError {
   }
 }
 
+impl From<kube::Error> for ApiError {
+  fn from(_value: kube::Error) -> Self {
+    ApiError::InternalError
+  }
+}
+
 impl ResponseError for ApiError {
   fn error_response(&self) -> HttpResponse {
     let status_code = self.status_code();

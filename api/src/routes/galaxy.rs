@@ -6,12 +6,8 @@ use actix_web::{
 };
 use derive_more::From;
 use serde::Serialize;
-
 use validator::Validate;
 
-use crate::error::{
-  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
 use crate::impl_json_responder;
 use crate::models::{
   galaxy::{CreateGalaxyData, Galaxy, GalaxyPath, UpdateGalaxyData, UserId},
@@ -20,6 +16,12 @@ use crate::models::{
   CrudOperations,
 };
 use crate::{database::Transaction, error::UnauthorizeResponse};
+use crate::{
+  error::{
+    AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+  },
+  k8s::NamespaceApi,
+};
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(description = "all user galaxies", content_type = "application/json")]
@@ -77,7 +79,12 @@ pub async fn create_galaxy(
 ) -> ApiResult<GalaxyCreated> {
   data.validate()?;
 
-  let new_galaxy = Galaxy::create(&mut tx, &user_id, data).await?;
+  let new_galaxy = Galaxy::create(&mut tx, &user_id, &data).await?;
+
+  NamespaceApi::try_default()
+    .await?
+    .create(&new_galaxy.id)
+    .await?;
 
   Ok(GalaxyCreated::from(new_galaxy))
 }
@@ -151,7 +158,9 @@ pub async fn update_galaxy(
 ) -> ApiResult<GalaxyUpdated> {
   data.validate()?;
 
-  let updated_galaxy = Galaxy::update(&mut tx, &path, data).await?;
+  let updated_galaxy = Galaxy::update(&mut tx, &path, &data).await?;
+
+  // namespace name is galaxy_id not need to update
 
   Ok(GalaxyUpdated::from(updated_galaxy))
 }
@@ -180,6 +189,11 @@ pub async fn delete_galaxy(
   path: Path<GalaxyPath>,
 ) -> ApiResult<GalaxyDeleted> {
   let deleted_galaxy = Galaxy::delete(&mut tx, &path).await?;
+
+  NamespaceApi::try_default()
+    .await?
+    .delete(&deleted_galaxy.id)
+    .await?;
 
   Ok(GalaxyDeleted::from(deleted_galaxy))
 }
