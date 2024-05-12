@@ -2,6 +2,13 @@
 k3d cluster create $CLUSTER_NAME -p "${CLUSTER_PORT}:80@loadbalancer"
 echo "export KUBECONFIG=\"$(k3d kubeconfig write gws)\"" >> ~/.bashrc
 
+# install k8s dashboard
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+
+kubectl create sa kube-ds-admin -n kube-system
+kubectl create clusterrolebinding kube-ds-admin-role-binding --clusterrole=admin --user=system:serviceaccount:kube-system:kube-ds-admin
+
 # install sqlx-cli
 cargo install sqlx-cli
 
