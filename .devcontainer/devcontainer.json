@@ -4,10 +4,23 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/rio/features/k3d:1": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-      "minikube": "none"
+      "minikube": "none",
     },
     "ghcr.io/itsmechlark/features/postgresql:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/devcontainers/features/rust:1": {}
-  }
+    "ghcr.io/devcontainers/features/rust:1": {},
+  },
+  "remoteEnv": {
+    "CLUSTER_NAME": "${localEnv:CLUSTER_NAME:gws}",
+    "CLUSTER_PORT": "${localEnv:CLUSTER_PORT:80}",
+  },
+  "containerEnv": {
+    "CLUSTER_NAME": "${remoteEnv:CLUSTER_NAME:gws}",
+    "CLUSTER_PORT": "${remoteEnv:CLUSTER_PORT:80}",
+  },
+  "postCreateCommand": "bash scripts/init-dev-env.sh",
+  "postAttachCommand": {
+    "api-server": "cargo run",
+    "web-server": "pnpm dev",
+  },
 }
