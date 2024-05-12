@@ -1,5 +1,8 @@
 use k8s_openapi::api::{apps::v1::Deployment, core::v1::Service, networking::v1::Ingress};
-use kube::{Api, Client, Result};
+use kube::{
+  api::{DeleteParams, PostParams},
+  Api, Client, Result,
+};
 use serde_json::json;
 
 use crate::models::star::Star;
@@ -32,7 +35,7 @@ impl From<&Star> for Deployment {
       "apiVersion": "apps/v1",
       "kind": "Deployment",
       "metadata": {
-        "name": value.id,
+        "name": format!("star-{}", value.id),
         "namespace": value.galaxy_id,
         "labels": {
           "star_name": value.name,
@@ -57,7 +60,7 @@ impl From<&Star> for Deployment {
           "spec": {
             "containers": [
               {
-                "name": value.id,
+                "name": format!("star-{}", value.id),
                 "image": value.nebula.to_lowercase(),
                 "env": [
                   {
@@ -91,7 +94,7 @@ impl From<&Star> for Service {
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": value.id,
+        "name": format!("star-{}", value.id),
         "labels": {
           "star_name": value.name,
           "star_id": value.id,
@@ -121,7 +124,7 @@ impl From<&Star> for Ingress {
       "apiVersion": "networking.k8s.io/v1",
       "kind": "Ingress",
       "metadata": {
-        "name": value.id,
+        "name": format!("star-{}", value.id),
         "labels": {
           "star_name": value.name,
           "star_id": value.id,
@@ -142,7 +145,7 @@ impl From<&Star> for Ingress {
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
-                      "name": value.id,
+                      "name": format!("star-{}", value.id),
                       "port": {
                         "number": PORT
                       }
@@ -183,32 +186,35 @@ impl ResourceBind for Star {
   }
 
   async fn update(&self, api: Self::RequestResolver) -> Result<()> {
-    let k8s_name = self.id.to_string();
+    let k8s_name = format!("star-{}", self.id.to_string());
+    let pp = PostParams::default();
 
     let _ = api
       .deploy
-      .replace(&k8s_name, &Default::default(), &Deployment::from(self))
+      .replace(&k8s_name, &pp, &Deployment::from(self))
       .await?;
 
     let _ = api
       .svc
-      .replace(&k8s_name, &Default::default(), &Service::from(self))
+      .replace(&k8s_name, &pp, &Service::from(self))
       .await?;
 
     let _ = api
       .ingress
-      .replace(&k8s_name, &Default::default(), &Ingress::from(self))
+      .replace(&k8s_name, &pp, &Ingress::from(self))
       .await?;
 
     Ok(())
   }
 
   async fn delete(&self, api: Self::RequestResolver) -> Result<()> {
-    let _ = api.deploy.delete(&self.name, &Default::default()).await?;
+    let dp = DeleteParams::default();
 
-    let _ = api.svc.delete(&self.name, &Default::default()).await?;
+    let _ = api.deploy.delete(&self.name, &dp).await?;
 
-    let _ = api.ingress.delete(&self.name, &Default::default()).await?;
+    let _ = api.svc.delete(&self.name, &dp).await?;
+
+    let _ = api.ingress.delete(&self.name, &dp).await?;
 
     Ok(())
   }

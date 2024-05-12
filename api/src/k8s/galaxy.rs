@@ -15,7 +15,7 @@ impl ResourceBind for Galaxy {
     let namespace = json!({
       "version": "v1",
       "metadata": {
-        "name": self.id,
+        "name": format!("galaxy-{}", self.id),
         "labels": {
           "galaxy_id": self.id
         }
