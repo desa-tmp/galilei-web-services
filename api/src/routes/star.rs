@@ -8,14 +8,17 @@ use derive_more::From;
 use serde::Serialize;
 use validator::Validate;
 
-use crate::error::{
-  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
 use crate::impl_json_responder;
 use crate::models::star::{
   CreateStarData, CrudOperations, GalaxyPath, Star, StarPath, UpdateStarData,
 };
 use crate::{database::Transaction, error::UnauthorizeResponse};
+use crate::{
+  error::{
+    AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+  },
+  k8s::{ResourceBind, StarRequestResolver},
+};
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(
@@ -75,7 +78,13 @@ pub async fn create_star(
 ) -> ApiResult<StarCreated> {
   data.validate()?;
 
-  let new_star = Star::create(&mut tx, &path, &data).await?;
+  let new_star = <Star as CrudOperations>::create(&mut tx, &path, &data).await?;
+
+  ResourceBind::create(
+    &new_star,
+    StarRequestResolver::try_default(&new_star.galaxy_id.to_string()).await?,
+  )
+  .await?;
 
   Ok(StarCreated::from(new_star))
 }
@@ -136,7 +145,13 @@ pub async fn update_star(
 ) -> ApiResult<StarUpdated> {
   data.validate()?;
 
-  let updated_star = Star::update(&mut tx, &path, &data).await?;
+  let updated_star = <Star as CrudOperations>::update(&mut tx, &path, &data).await?;
+
+  ResourceBind::update(
+    &updated_star,
+    StarRequestResolver::try_default(&updated_star.galaxy_id.to_string()).await?,
+  )
+  .await?;
 
   Ok(StarUpdated::from(updated_star))
 }
@@ -161,7 +176,13 @@ impl_json_responder!(StarDeleted, StatusCode::OK);
 )]
 #[delete("/galaxies/{galaxy_id}/stars/{star_id}")]
 pub async fn delete_star(mut tx: Transaction, path: Path<StarPath>) -> ApiResult<StarDeleted> {
-  let deleted_star = Star::delete(&mut tx, &path).await?;
+  let deleted_star = <Star as CrudOperations>::delete(&mut tx, &path).await?;
+
+  ResourceBind::delete(
+    &deleted_star,
+    StarRequestResolver::try_default(&deleted_star.galaxy_id.to_string()).await?,
+  )
+  .await?;
 
   Ok(StarDeleted::from(deleted_star))
 }

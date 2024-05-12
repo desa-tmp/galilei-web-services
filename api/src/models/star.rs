@@ -28,7 +28,7 @@ gen_update_data! {
     #[validate(length(min = 1, message = "cannot be empty"))]
     name: String,
     #[schema(format = Uri)]
-    #[validate(url(message = "must be a valid url"))]
+    #[validate(length(min = 1, message = "cannot be empty"))]
     nebula: String,
   }
 }

@@ -5,6 +5,7 @@ use actix_web::{
   web::{Json, Path, ReqData, ServiceConfig},
 };
 use derive_more::From;
+use kube::Client;
 use serde::Serialize;
 use validator::Validate;
 
@@ -20,7 +21,7 @@ use crate::{
   error::{
     AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
   },
-  k8s::NamespaceApi,
+  k8s::ResourceBind,
 };
 
 #[derive(Serialize, From, utoipa::ToResponse)]
@@ -79,12 +80,9 @@ pub async fn create_galaxy(
 ) -> ApiResult<GalaxyCreated> {
   data.validate()?;
 
-  let new_galaxy = Galaxy::create(&mut tx, &user_id, &data).await?;
+  let new_galaxy = <Galaxy as CrudOperations>::create(&mut tx, &user_id, &data).await?;
 
-  NamespaceApi::try_default()
-    .await?
-    .create(&new_galaxy.id)
-    .await?;
+  ResourceBind::create(&new_galaxy, Client::try_default().await?).await?;
 
   Ok(GalaxyCreated::from(new_galaxy))
 }
@@ -158,7 +156,7 @@ pub async fn update_galaxy(
 ) -> ApiResult<GalaxyUpdated> {
   data.validate()?;
 
-  let updated_galaxy = Galaxy::update(&mut tx, &path, &data).await?;
+  let updated_galaxy = <Galaxy as CrudOperations>::update(&mut tx, &path, &data).await?;
 
   // namespace name is galaxy_id not need to update
 
@@ -188,12 +186,9 @@ pub async fn delete_galaxy(
   mut tx: Transaction,
   path: Path<GalaxyPath>,
 ) -> ApiResult<GalaxyDeleted> {
-  let deleted_galaxy = Galaxy::delete(&mut tx, &path).await?;
+  let deleted_galaxy = <Galaxy as CrudOperations>::delete(&mut tx, &path).await?;
 
-  NamespaceApi::try_default()
-    .await?
-    .delete(&deleted_galaxy.id)
-    .await?;
+  ResourceBind::delete(&deleted_galaxy, Client::try_default().await?).await?;
 
   Ok(GalaxyDeleted::from(deleted_galaxy))
 }
