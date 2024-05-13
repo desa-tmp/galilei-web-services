@@ -4,6 +4,7 @@ use kube::{
   Api, Client, Result,
 };
 use serde_json::json;
+use uuid::Uuid;
 
 use crate::models::star::Star;
 
@@ -16,13 +17,14 @@ pub struct StarRequestResolver {
 }
 
 impl StarRequestResolver {
-  pub async fn try_default(ns: &str) -> Result<Self> {
+  pub async fn try_default(galaxy_id: &Uuid) -> Result<Self> {
     let client = Client::try_default().await?;
+    let galaxy_ns = format!("galaxy-{}", galaxy_id);
 
     Ok(Self {
-      deploy: Api::namespaced(client.clone(), ns),
-      svc: Api::namespaced(client.clone(), ns),
-      ingress: Api::namespaced(client, ns),
+      deploy: Api::namespaced(client.clone(), &galaxy_ns),
+      svc: Api::namespaced(client.clone(), &galaxy_ns),
+      ingress: Api::namespaced(client, &galaxy_ns),
     })
   }
 }
@@ -36,7 +38,7 @@ impl From<&Star> for Deployment {
       "kind": "Deployment",
       "metadata": {
         "name": format!("star-{}", value.id),
-        "namespace": value.galaxy_id,
+        "namespace": format!("galaxy-{}", value.galaxy_id),
         "labels": {
           "star_name": value.name,
           "star_id": value.id,
@@ -95,6 +97,7 @@ impl From<&Star> for Service {
       "kind": "Service",
       "metadata": {
         "name": format!("star-{}", value.id),
+        "namespace": format!("galaxy-{}", value.galaxy_id),
         "labels": {
           "star_name": value.name,
           "star_id": value.id,
@@ -125,6 +128,7 @@ impl From<&Star> for Ingress {
       "kind": "Ingress",
       "metadata": {
         "name": format!("star-{}", value.id),
+        "namespace": format!("galaxy-{}", value.galaxy_id),
         "labels": {
           "star_name": value.name,
           "star_id": value.id,

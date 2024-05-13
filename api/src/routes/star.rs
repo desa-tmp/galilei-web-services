@@ -82,7 +82,7 @@ pub async fn create_star(
 
   ResourceBind::create(
     &new_star,
-    StarRequestResolver::try_default(&new_star.galaxy_id.to_string()).await?,
+    StarRequestResolver::try_default(&new_star.galaxy_id).await?,
   )
   .await?;
 
@@ -149,7 +149,7 @@ pub async fn update_star(
 
   ResourceBind::update(
     &updated_star,
-    StarRequestResolver::try_default(&updated_star.galaxy_id.to_string()).await?,
+    StarRequestResolver::try_default(&updated_star.galaxy_id).await?,
   )
   .await?;
 
@@ -180,7 +180,7 @@ pub async fn delete_star(mut tx: Transaction, path: Path<StarPath>) -> ApiResult
 
   ResourceBind::delete(
     &deleted_star,
-    StarRequestResolver::try_default(&deleted_star.galaxy_id.to_string()).await?,
+    StarRequestResolver::try_default(&deleted_star.galaxy_id).await?,
   )
   .await?;
 

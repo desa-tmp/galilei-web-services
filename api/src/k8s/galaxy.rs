@@ -39,7 +39,7 @@ impl ResourceBind for Galaxy {
 
   async fn delete(&self, client: Self::RequestResolver) -> Result<()> {
     let req = Request::new(NAMESPACE_BASE_PATH)
-      .delete(&self.id.to_string(), &Default::default())
+      .delete(&format!("galaxy-{}", self.id), &Default::default())
       .map_err(|err| Error::BuildRequest(err))?;
 
     let _: Value = client.request(req).await?;
