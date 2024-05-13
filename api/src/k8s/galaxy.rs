@@ -8,24 +8,32 @@ use super::ResourceBind;
 
 const NAMESPACE_BASE_PATH: &'static str = "/api/v1/namespaces";
 
-impl ResourceBind for Galaxy {
-  type RequestResolver = Client;
-
-  async fn create(&self, client: Self::RequestResolver) -> Result<()> {
+impl From<&Galaxy> for Namespace {
+  fn from(value: &Galaxy) -> Self {
     let namespace = json!({
       "version": "v1",
       "metadata": {
-        "name": format!("galaxy-{}", self.id),
+        "name": format!("galaxy-{}", value.id),
         "labels": {
-          "galaxy_id": self.id
+          "name": value.name,
+          "galaxy_id": value.id
         }
       }
     });
 
-    let namespace = serde_json::to_vec(&namespace).expect("Invalid namespace format");
+    serde_json::from_value(namespace).expect("Invalid namespace format")
+  }
+}
+
+impl ResourceBind for Galaxy {
+  type RequestResolver = Client;
+
+  async fn create(&self, client: Self::RequestResolver) -> Result<()> {
+    let namespace = Namespace::from(self);
+    let ns_buf = serde_json::to_vec(&namespace).expect("Error converting namespace to Vec<u8>");
 
     let req = Request::new(NAMESPACE_BASE_PATH)
-      .create(&Default::default(), namespace)
+      .create(&Default::default(), ns_buf)
       .map_err(|err| Error::BuildRequest(err))?;
 
     let _: Namespace = client.request(req).await?;
@@ -33,8 +41,17 @@ impl ResourceBind for Galaxy {
     Ok(())
   }
 
-  async fn update(&self, _client: Self::RequestResolver) -> Result<()> {
-    unreachable!();
+  async fn update(&self, client: Self::RequestResolver) -> Result<()> {
+    let namespace = Namespace::from(self);
+    let ns_buf = serde_json::to_vec(&namespace).expect("Error converting namespace to Vec<u8>");
+
+    let req = Request::new(NAMESPACE_BASE_PATH)
+      .replace(&format!("galaxy-{}", self.id), &Default::default(), ns_buf)
+      .map_err(|err| Error::BuildRequest(err))?;
+
+    let _: Value = client.request(req).await?;
+
+    Ok(())
   }
 
   async fn delete(&self, client: Self::RequestResolver) -> Result<()> {

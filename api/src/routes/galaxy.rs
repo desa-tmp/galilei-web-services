@@ -158,7 +158,7 @@ pub async fn update_galaxy(
 
   let updated_galaxy = <Galaxy as CrudOperations>::update(&mut tx, &path, &data).await?;
 
-  // namespace name is galaxy_id not need to update
+  ResourceBind::update(&updated_galaxy, Client::try_default().await?).await?;
 
   Ok(GalaxyUpdated::from(updated_galaxy))
 }
