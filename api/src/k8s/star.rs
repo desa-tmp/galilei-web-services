@@ -212,13 +212,14 @@ impl ResourceBind for Star {
   }
 
   async fn delete(&self, api: Self::RequestResolver) -> Result<()> {
+    let k8s_name = format!("star-{}", self.id.to_string());
     let dp = DeleteParams::default();
 
-    let _ = api.deploy.delete(&self.name, &dp).await?;
+    let _ = api.deploy.delete(&k8s_name, &dp).await?;
 
-    let _ = api.svc.delete(&self.name, &dp).await?;
+    let _ = api.svc.delete(&k8s_name, &dp).await?;
 
-    let _ = api.ingress.delete(&self.name, &dp).await?;
+    let _ = api.ingress.delete(&k8s_name, &dp).await?;
 
     Ok(())
   }
