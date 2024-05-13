@@ -41,6 +41,18 @@ export async function register(data: Register) {
   redirect("/galaxies");
 }
 
+export async function logout() {
+  const { error } = await api.DELETE("/auth/logout", {
+    method: "DELETE",
+  });
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  redirect("/login");
+}
+
 export async function newGalaxy(data: GalaxyData) {
   const galaxyData = GalaxyDataSchema.parse(data);
 
@@ -68,6 +80,18 @@ export async function updateGalaxy(galaxy_id: string, data: GalaxyData) {
   }
 
   redirect(`/galaxies/${galaxy.id}`);
+}
+
+export async function deleteGalaxy(galaxy_id: string) {
+  const { error } = await api.DELETE("/galaxies/{galaxy_id}", {
+    params: { path: { galaxy_id } },
+  });
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  redirect("/galaxies");
 }
 
 export async function newStar(galaxyId: string, data: StarData) {
@@ -107,6 +131,24 @@ export async function updateStar(
   }
 
   revalidateTag("galaxy");
+}
+
+export async function deleteStar(galaxyId: string, starId: string) {
+  const { error } = await api.DELETE("/galaxies/{galaxy_id}/stars/{star_id}", {
+    params: {
+      path: {
+        galaxy_id: galaxyId,
+        star_id: starId,
+      },
+    },
+  });
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  revalidateTag("galaxy");
+  redirect(`/galaxies/${galaxyId}`);
 }
 
 export async function newPlanet(galaxyId: string, data: PlanetData) {
@@ -149,4 +191,25 @@ export async function updatePlanet(
   }
 
   revalidateTag("galaxy");
+}
+
+export async function deletePlanet(galaxyId: string, planetId: string) {
+  const { error } = await api.DELETE(
+    "/galaxies/{galaxy_id}/planets/{planet_id}",
+    {
+      params: {
+        path: {
+          galaxy_id: galaxyId,
+          planet_id: planetId,
+        },
+      },
+    }
+  );
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  revalidateTag("galaxy");
+  redirect(`/galaxies/${galaxyId}`);
 }

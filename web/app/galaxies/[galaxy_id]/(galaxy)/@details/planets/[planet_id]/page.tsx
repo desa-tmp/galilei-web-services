@@ -1,5 +1,6 @@
+import ActionBtn from "@/components/action-btn";
 import PlanetForm from "@/components/planet-form";
-import { updatePlanet } from "@/lib/actions";
+import { deletePlanet, updatePlanet } from "@/lib/actions";
 import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
 import { ApiError } from "api-client";
@@ -33,8 +34,8 @@ export default async function PlanetPage({
   }
 
   return (
-    <div className="size-full">
-      <header className="flex items-center gap-4 pb-4">
+    <div className="flex size-full flex-col gap-4">
+      <header className="flex items-center gap-4">
         <Earth />
         <h1 className="text-2xl font-bold">{planet.name}</h1>
       </header>
@@ -43,6 +44,13 @@ export default async function PlanetPage({
         stars={stars}
         planet={{ ...planet, star_id: planet.star_id ?? "" }}
       />
+      <ActionBtn
+        variant="destructive"
+        className="mt-auto"
+        action={deletePlanet.bind(null, galaxy_id, planet_id)}
+      >
+        Delete Star
+      </ActionBtn>
     </div>
   );
 }

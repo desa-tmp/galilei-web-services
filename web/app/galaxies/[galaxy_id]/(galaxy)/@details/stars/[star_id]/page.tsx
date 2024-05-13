@@ -1,5 +1,6 @@
+import ActionBtn from "@/components/action-btn";
 import StarForm from "@/components/star-form";
-import { updateStar } from "@/lib/actions";
+import { deleteStar, updateStar } from "@/lib/actions";
 import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
 import { ApiError } from "api-client";
@@ -22,8 +23,8 @@ export default async function StarPage({
   }
 
   return (
-    <div className="size-full">
-      <header className="flex items-center gap-4 pb-4">
+    <div className="flex size-full flex-col gap-4">
+      <header className="flex items-center gap-4">
         <StarIcon />
         <h1 className="text-2xl font-bold">{star.name}</h1>
       </header>
@@ -31,6 +32,13 @@ export default async function StarPage({
         action={updateStar.bind(null, galaxy_id, star_id)}
         star={star}
       />
+      <ActionBtn
+        variant="destructive"
+        className="mt-auto"
+        action={deleteStar.bind(null, galaxy_id, star_id)}
+      >
+        Delete Star
+      </ActionBtn>
     </div>
   );
 }
