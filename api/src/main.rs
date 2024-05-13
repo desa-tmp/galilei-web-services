@@ -21,7 +21,7 @@ async fn main() -> std::io::Result<()> {
 
   let pool = api::database::create_pool(&database_url, MAX_CONNECTIONS)
     .await
-    .expect("Successfully connect to database");
+    .expect("Unable connect to database");
 
   HttpServer::new(move || {
     App::new()
