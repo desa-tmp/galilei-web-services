@@ -86,10 +86,12 @@ pub struct ErrorMessage {
   message: String,
 }
 
+#[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(description = "User not authorized", content_type = "application/json")]
 pub struct UnauthorizeResponse(ErrorMessage);
 
+#[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
   description = "Requested resources not found",
@@ -97,6 +99,7 @@ pub struct UnauthorizeResponse(ErrorMessage);
 )]
 pub struct NotFoundResponse(ErrorMessage);
 
+#[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
   description = "The resource already exists",
@@ -104,6 +107,7 @@ pub struct NotFoundResponse(ErrorMessage);
 )]
 pub struct AlreadyExistsResponse(ErrorMessage);
 
+#[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
   description = "The body of the request contains incorrect data",
@@ -111,6 +115,7 @@ pub struct AlreadyExistsResponse(ErrorMessage);
 )]
 pub struct ValidationResponse(ErrorMessage);
 
+#[allow(dead_code)]
 #[derive(ToResponse)]
 #[response(
   description = "An internal error occurred",
