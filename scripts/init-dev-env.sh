@@ -26,3 +26,6 @@ sudo service postgresql start
 
 # create database
 sqlx database reset --source ./api/migrations/ -y
+
+# install web dependecies
+pnpm i
