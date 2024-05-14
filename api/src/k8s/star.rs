@@ -32,38 +32,38 @@ impl StarRequestResolver {
 const PORT: i32 = 80;
 
 impl From<&Star> for Deployment {
-  fn from(value: &Star) -> Self {
+  fn from(star: &Star) -> Self {
     let deployment = json!({
       "apiVersion": "apps/v1",
       "kind": "Deployment",
       "metadata": {
-        "name": format!("star-{}", value.id),
-        "namespace": format!("galaxy-{}", value.galaxy_id),
+        "name": format!("star-{}", star.id),
+        "namespace": format!("galaxy-{}", star.galaxy_id),
         "labels": {
-          "star_name": value.name,
-          "star_id": value.id,
-          "galaxy_id": value.galaxy_id,
+          "star_name": star.name,
+          "star_id": star.id,
+          "galaxy_id": star.galaxy_id,
         },
       },
       "spec": {
-        "replicas": 2,
+        "replicas": 1,
         "selector": {
           "matchLabels": {
-            "star_id": value.id,
+            "star_id": star.id,
           },
         },
         "template": {
           "metadata": {
             "labels": {
-              "star_name": value.name,
-              "star_id": value.id,
+              "star_name": star.name,
+              "star_id": star.id,
             },
           },
           "spec": {
             "containers": [
               {
-                "name": format!("star-{}", value.id),
-                "image": value.nebula.to_lowercase(),
+                "name": format!("star-container-{}", star.id),
+                "image": star.nebula.to_lowercase(),
                 "env": [
                   {
                     "name": "ADDRESS",
@@ -91,22 +91,22 @@ impl From<&Star> for Deployment {
 }
 
 impl From<&Star> for Service {
-  fn from(value: &Star) -> Self {
+  fn from(star: &Star) -> Self {
     let svc = json!({
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": format!("star-{}", value.id),
-        "namespace": format!("galaxy-{}", value.galaxy_id),
+        "name": format!("star-{}", star.id),
+        "namespace": format!("galaxy-{}", star.galaxy_id),
         "labels": {
-          "star_name": value.name,
-          "star_id": value.id,
-          "galaxy_id": value.galaxy_id,
+          "star_name": star.name,
+          "star_id": star.id,
+          "galaxy_id": star.galaxy_id,
         },
       },
       "spec": {
         "selector": {
-          "star_id": value.id,
+          "star_id": star.id,
         },
         "ports": [
           {
@@ -122,17 +122,17 @@ impl From<&Star> for Service {
 }
 
 impl From<&Star> for Ingress {
-  fn from(value: &Star) -> Self {
+  fn from(star: &Star) -> Self {
     let ingress = json!({
       "apiVersion": "networking.k8s.io/v1",
       "kind": "Ingress",
       "metadata": {
-        "name": format!("star-{}", value.id),
-        "namespace": format!("galaxy-{}", value.galaxy_id),
+        "name": format!("star-{}", star.id),
+        "namespace": format!("galaxy-{}", star.galaxy_id),
         "labels": {
-          "star_name": value.name,
-          "star_id": value.id,
-          "galaxy_id": value.galaxy_id,
+          "star_name": star.name,
+          "star_id": star.id,
+          "galaxy_id": star.galaxy_id,
         },
         "annotations": {
           "ingress.kubernetes.io/ssl-redirect": "false"
@@ -141,7 +141,7 @@ impl From<&Star> for Ingress {
       "spec": {
         "rules": [
           {
-            "host": format!("{}.localhost", value.name),
+            "host": format!("{}.localhost", star.name),
             "http": {
               "paths": [
                 {
@@ -149,7 +149,7 @@ impl From<&Star> for Ingress {
                   "pathType": "Prefix",
                   "backend": {
                     "service": {
-                      "name": format!("star-{}", value.id),
+                      "name": format!("star-{}", star.id),
                       "port": {
                         "number": PORT
                       }

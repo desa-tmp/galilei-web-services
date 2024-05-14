@@ -8,14 +8,17 @@ use derive_more::From;
 use serde::Serialize;
 use validator::Validate;
 
-use crate::error::{
-  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
 use crate::impl_json_responder;
 use crate::models::planet::{
   CreatePlanetData, CrudOperations, GalaxyPath, Planet, PlanetPath, UpdatePlanetData,
 };
 use crate::{database::Transaction, error::UnauthorizeResponse};
+use crate::{
+  error::{
+    AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+  },
+  k8s::{PlanetRequestResolver, ResourceBind},
+};
 
 #[derive(Serialize, From, utoipa::ToResponse)]
 #[response(
@@ -78,7 +81,13 @@ pub async fn create_planet(
 ) -> ApiResult<PlanetCreated> {
   data.validate()?;
 
-  let new_planet = Planet::create(&mut tx, &path, &data).await?;
+  let new_planet = <Planet as CrudOperations>::create(&mut tx, &path, &data).await?;
+
+  ResourceBind::create(
+    &new_planet,
+    PlanetRequestResolver::try_default(&new_planet.galaxy_id).await?,
+  )
+  .await?;
 
   Ok(PlanetCreated::from(new_planet))
 }
@@ -139,7 +148,13 @@ pub async fn update_planet(
 ) -> ApiResult<PlanetUpdated> {
   data.validate()?;
 
-  let updated_planet = Planet::update(&mut tx, &path, &data).await?;
+  let updated_planet = <Planet as CrudOperations>::update(&mut tx, &path, &data).await?;
+
+  ResourceBind::update(
+    &updated_planet,
+    PlanetRequestResolver::try_default(&updated_planet.galaxy_id).await?,
+  )
+  .await?;
 
   Ok(PlanetUpdated::from(updated_planet))
 }
@@ -167,7 +182,13 @@ pub async fn delete_planet(
   mut tx: Transaction,
   path: Path<PlanetPath>,
 ) -> ApiResult<PlanetDeleted> {
-  let deleted_planet = Planet::delete(&mut tx, &path).await?;
+  let deleted_planet = <Planet as CrudOperations>::delete(&mut tx, &path).await?;
+
+  ResourceBind::update(
+    &deleted_planet,
+    PlanetRequestResolver::try_default(&deleted_planet.galaxy_id).await?,
+  )
+  .await?;
 
   Ok(PlanetDeleted::from(deleted_planet))
 }
