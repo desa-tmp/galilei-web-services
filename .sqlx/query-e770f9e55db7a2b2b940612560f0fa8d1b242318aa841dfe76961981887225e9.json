@@ -20,6 +20,11 @@
       },
       {
         "ordinal": 3,
+        "name": "domain",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
         "name": "galaxy_id",
         "type_info": "Uuid"
       }
@@ -31,6 +36,7 @@
       ]
     },
     "nullable": [
+      false,
       false,
       false,
       false,

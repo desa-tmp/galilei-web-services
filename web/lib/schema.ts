@@ -47,6 +47,9 @@ export const StarDataSchema = z.object({
   nebula: z.string().min(1, {
     message: "Star nebula is required",
   }),
+  domain: z.string().min(1, {
+    message: "Star domain is required",
+  }),
 }) satisfies ZodType<StarData>;
 
 export type Planet = components["schemas"]["Planet"];

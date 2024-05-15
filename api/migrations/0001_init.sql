@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS stars (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   nebula TEXT NOT NULL,
+  domain TEXT NOT NULL UNIQUE, 
   galaxy_id UUID NOT NULL,
   FOREIGN KEY (galaxy_id) REFERENCES galaxies(id) ON DELETE CASCADE,
   CONSTRAINT star_name_galaxy UNIQUE (name, galaxy_id) -- unique star name inside a galaxy

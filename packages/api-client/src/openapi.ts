@@ -73,6 +73,8 @@ export interface components {
       star: components["schemas"]["ConnectPlanetToStar"];
     };
     CreateStarData: {
+      /** Format: uri */
+      domain: string;
       name: string;
       /** Format: uri */
       nebula: string;
@@ -108,6 +110,7 @@ export interface components {
       star_id?: string | null;
     };
     Star: {
+      domain: string;
       /** Format: uuid */
       galaxy_id: string;
       /** Format: uuid */
@@ -127,6 +130,8 @@ export interface components {
       star?: components["schemas"]["ConnectPlanetToStar"] | null;
     };
     UpdateStarData: {
+      /** Format: uri */
+      domain?: string | null;
       name?: string | null;
       /** Format: uri */
       nebula?: string | null;

@@ -141,7 +141,7 @@ impl From<&Star> for Ingress {
       "spec": {
         "rules": [
           {
-            "host": format!("{}.localhost", star.name),
+            "host": format!("{}.localhost", star.domain),
             "http": {
               "paths": [
                 {

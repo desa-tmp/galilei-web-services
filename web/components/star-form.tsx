@@ -23,6 +23,7 @@ interface StarFormProps {
 const EMPTY_STAR: StarData = {
   name: "",
   nebula: "",
+  domain: "",
 };
 
 export default function StarForm({ action, star }: StarFormProps) {
@@ -57,6 +58,19 @@ export default function StarForm({ action, star }: StarFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nebula</FormLabel>
+              <FormControl>
+                <Input type="text" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="domain"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Domain</FormLabel>
               <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
               </FormControl>

@@ -17,6 +17,8 @@ pub struct Star {
   pub name: String,
   #[schema(format = Uri)]
   pub nebula: String,
+  #[schema(min_length = 1)]
+  pub domain: String,
   pub galaxy_id: Uuid,
 }
 
@@ -30,6 +32,9 @@ gen_update_data! {
     #[schema(format = Uri)]
     #[validate(length(min = 1, message = "cannot be empty"))]
     nebula: String,
+    #[schema(format = Uri)]
+    #[validate(length(min = 1, message = "cannot be empty"))]
+    domain: String,
   }
 }
 
@@ -75,13 +80,18 @@ impl CrudOperations for Star {
     data: &Self::CreateData,
   ) -> DbResult<Self> {
     let GalaxyPath(galaxy_id) = ident;
-    let CreateStarData { name, nebula } = data;
+    let CreateStarData {
+      name,
+      nebula,
+      domain,
+    } = data;
 
     let new_star = sqlx::query_as!(
       Star,
-      "INSERT INTO stars(name, nebula, galaxy_id) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO stars(name, nebula, domain, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
       name,
       nebula,
+      domain,
       galaxy_id
     )
     .fetch_one(conn)
@@ -95,19 +105,25 @@ impl CrudOperations for Star {
     data: &Self::UpdateData,
   ) -> DbResult<Self> {
     let StarPath(galaxy_id, star_id) = ident;
-    let UpdateStarData { name, nebula } = data;
+    let UpdateStarData {
+      name,
+      nebula,
+      domain,
+    } = data;
 
     let updated_star = sqlx::query_as!(
       Star,
       r#"
       UPDATE stars
       SET name = COALESCE($1, name),
-        nebula = COALESCE($2, nebula)
-      WHERE galaxy_id = $3 AND id = $4
+        nebula = COALESCE($2, nebula),
+        domain = COALESCE($3, domain)
+      WHERE galaxy_id = $4 AND id = $5
       RETURNING *
     "#,
       name.as_deref(),
       nebula.as_deref(),
+      domain.as_deref(),
       galaxy_id,
       star_id
     )

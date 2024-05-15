@@ -845,9 +845,14 @@
         "type": "object",
         "required": [
           "name",
-          "nebula"
+          "nebula",
+          "domain"
         ],
         "properties": {
+          "domain": {
+            "type": "string",
+            "format": "uri"
+          },
           "name": {
             "type": "string",
             "minLength": 1
@@ -971,9 +976,14 @@
           "id",
           "name",
           "nebula",
+          "domain",
           "galaxy_id"
         ],
         "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1
+          },
           "galaxy_id": {
             "type": "string",
             "format": "uuid"
@@ -1035,6 +1045,11 @@
       "UpdateStarData": {
         "type": "object",
         "properties": {
+          "domain": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
           "name": {
             "type": "string",
             "nullable": true,
