@@ -33,6 +33,7 @@ interface PlanetFormProps {
 const EMPTY_PLANET: PlanetData = {
   name: "",
   capacity: 5,
+  path: "",
   star_id: "",
 };
 
@@ -75,6 +76,19 @@ export default function PlanetForm({ action, stars, planet }: PlanetFormProps) {
               <FormLabel>Capacity</FormLabel>
               <FormControl>
                 <Input type="number" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="path"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Path</FormLabel>
+              <FormControl>
+                <Input type="text" autoComplete="off" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

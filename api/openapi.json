@@ -818,6 +818,7 @@
         "required": [
           "name",
           "capacity",
+          "path",
           "star"
         ],
         "properties": {
@@ -828,6 +829,10 @@
             "minimum": 0
           },
           "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
             "type": "string",
             "minLength": 1
           },
@@ -927,6 +932,7 @@
           "id",
           "name",
           "capacity",
+          "path",
           "galaxy_id"
         ],
         "properties": {
@@ -945,6 +951,10 @@
             "format": "uuid"
           },
           "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
             "type": "string",
             "minLength": 1
           },
@@ -1003,6 +1013,11 @@
             "minimum": 0
           },
           "name": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
+          },
+          "path": {
             "type": "string",
             "nullable": true,
             "minLength": 1

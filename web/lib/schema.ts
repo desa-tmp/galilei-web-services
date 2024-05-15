@@ -65,5 +65,8 @@ export const PlanetDataSchema = z.object({
   capacity: z.coerce.number().min(0, {
     message: "Minimum planet capacity is 0",
   }),
+  path: z.coerce.string().min(0, {
+    message: "Minimum planet capacity is 0",
+  }),
   star_id: z.string(),
 }) satisfies ZodType<PlanetData>;

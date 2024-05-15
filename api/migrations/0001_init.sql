@@ -34,9 +34,11 @@ CREATE TABLE IF NOT EXISTS planets (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   capacity INT NOT NULL CHECK(capacity >= 0), -- unit size is MB
+  path TEXT NOT NULL,
   star_id UUID, -- a planet may not have a star associated with it
   galaxy_id UUID NOT NULL,
   FOREIGN KEY (star_id) REFERENCES stars(id) ON DELETE SET NULL,
   FOREIGN KEY (galaxy_id) REFERENCES galaxies(id) ON DELETE CASCADE,
-  CONSTRAINT planet_name_galaxy UNIQUE (name, galaxy_id) -- unique planet name inside a galaxy
+  CONSTRAINT planet_name_galaxy UNIQUE (name, galaxy_id), -- unique planet name inside a galaxy
+  CONSTRAINT unique_planet_path_in_star UNIQUE (path, star_id) -- planet path is unique when connected to same star star
 );

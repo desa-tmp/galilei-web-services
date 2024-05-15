@@ -49,7 +49,7 @@ export default async function PlanetPage({
         className="mt-auto"
         action={deletePlanet.bind(null, galaxy_id, planet_id)}
       >
-        Delete Star
+        Delete Planet
       </ActionBtn>
     </div>
   );

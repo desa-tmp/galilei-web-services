@@ -69,6 +69,7 @@ export interface components {
       /** Format: int32 */
       capacity: number;
       name: string;
+      path: string;
       star: components["schemas"]["ConnectPlanetToStar"];
     };
     CreateStarData: {
@@ -102,6 +103,7 @@ export interface components {
       /** Format: uuid */
       id: string;
       name: string;
+      path: string;
       /** Format: uuid */
       star_id?: string | null;
     };
@@ -121,6 +123,7 @@ export interface components {
       /** Format: int32 */
       capacity?: number | null;
       name?: string | null;
+      path?: string | null;
       star?: components["schemas"]["ConnectPlanetToStar"] | null;
     };
     UpdateStarData: {

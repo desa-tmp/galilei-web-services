@@ -108,7 +108,7 @@ impl From<&Planet> for Patch<Deployment> {
                 "volumeMounts": [
                   {
                     "name": format!("planet-volume-{}", planet.id),
-                    "mountPath": "/data"
+                    "mountPath": planet.path
                   }
                 ]
               }

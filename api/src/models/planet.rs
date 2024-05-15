@@ -17,6 +17,8 @@ pub struct Planet {
   pub name: String,
   #[schema(minimum = 0, maximum = 2147483647)]
   pub capacity: i32,
+  #[schema(min_length = 1)]
+  pub path: String,
   pub star_id: Option<Uuid>,
   pub galaxy_id: Uuid,
 }
@@ -36,6 +38,9 @@ gen_update_data! {
     #[schema(minimum = 0, maximum = 2147483647)]
     #[validate(range(min = 0, max = 2147483647, message = "capacity must be between 0 and 2147483647"))]
     capacity: i32,
+    #[schema(min_length = 1)]
+    #[validate(length(min = 1, message = "cannot be empty"))]
+    path: String,
     star: ConnectPlanetToStar,
   }
 }
@@ -89,14 +94,16 @@ impl CrudOperations for Planet {
     let CreatePlanetData {
       name,
       capacity,
+      path,
       star,
     } = data;
 
     let new_galaxy = sqlx::query_as!(
       Planet,
-      "INSERT INTO planets(name, capacity, star_id, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO planets(name, capacity, path, star_id, galaxy_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       name,
       capacity,
+      path,
       star.id,
       galaxy_id
     )
@@ -114,6 +121,7 @@ impl CrudOperations for Planet {
     let UpdatePlanetData {
       name,
       capacity,
+      path,
       star,
     } = data;
 
@@ -126,12 +134,14 @@ impl CrudOperations for Planet {
       UPDATE planets
       SET name = COALESCE($1, name),
         capacity = COALESCE($2, capacity),
-        star_id = (CASE WHEN $3 = true THEN $4 ELSE star_id END)
-      WHERE galaxy_id = $5 AND id = $6
+        path = COALESCE($3, path),
+        star_id = (CASE WHEN $4 = true THEN $5 ELSE star_id END)
+      WHERE galaxy_id = $6 AND id = $7
       RETURNING *
     "#,
       name.as_deref(),
       capacity.as_ref(),
+      path.as_deref(),
       update_star,
       star_id,
       galaxy_id,
