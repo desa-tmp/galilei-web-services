@@ -2,10 +2,18 @@ use actix_web::{
   delete, get,
   http::StatusCode,
   post, put,
-  web::{Json, Path, ServiceConfig},
+  web::{Json, Path, Query, ServiceConfig},
+  Either,
 };
+use actix_web_lab::sse::{self, Sse};
 use derive_more::From;
-use serde::Serialize;
+use futures_util::{stream::Map, Stream, StreamExt};
+use k8s_openapi::api::apps::v1::{Deployment, DeploymentStatus};
+use kube::{
+  runtime::{utils::EventFlatten, watcher, WatchStreamExt},
+  Api, Client,
+};
+use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::impl_json_responder;
@@ -89,13 +97,39 @@ pub async fn create_star(
   Ok(StarCreated::from(new_star))
 }
 
+#[derive(Deserialize, utoipa::IntoParams)]
+pub struct WatchQuery {
+  watch: Option<bool>,
+}
+
+#[derive(Serialize, utoipa::ToSchema)]
+#[serde(tag = "status")]
+pub enum StarStatus {
+  Active,
+  Failure,
+}
+
 #[derive(Serialize, From, utoipa::ToResponse)]
-#[response(description = "specific star", content_type = "application/json")]
-pub struct SpecificStar(Star);
+#[serde(untagged)]
+#[response(description = "specific star in the galaxy")]
+pub enum SpecificStar {
+  Star(#[content("application/json")] Star),
+  Status(#[content("text/event-stream")] StarStatus),
+}
 impl_json_responder!(SpecificStar, StatusCode::OK);
 
+impl SpecificStar {
+  fn status(status: DeploymentStatus) -> Self {
+    // TODO fix this is valid only for deployments with replication set to 1
+    Self::Status(match status.available_replicas {
+      Some(_) => StarStatus::Active,
+      None => StarStatus::Failure,
+    })
+  }
+}
+
 #[utoipa::path(
-  params(StarPath),
+  params(StarPath, WatchQuery),
   responses(
     (status = OK, response = SpecificStar),
     (status = NOT_FOUND, response = NotFoundResponse),
@@ -106,10 +140,49 @@ impl_json_responder!(SpecificStar, StatusCode::OK);
   )
 )]
 #[get("/galaxies/{galaxy_id}/stars/{star_id}")]
-pub async fn get_star(mut tx: Transaction, path: Path<StarPath>) -> ApiResult<SpecificStar> {
+pub async fn get_star(
+  mut tx: Transaction,
+  path: Path<StarPath>,
+  Query(WatchQuery { watch }): Query<WatchQuery>,
+) -> ApiResult<
+  Either<
+    SpecificStar,
+    Sse<
+      Map<
+        EventFlatten<
+          impl Stream<Item = Result<watcher::Event<Deployment>, watcher::Error>> + Send,
+          Deployment,
+        >,
+        impl FnMut(Result<Deployment, watcher::Error>) -> Result<sse::Event, watcher::Error>,
+      >,
+    >,
+  >,
+> {
   let star = Star::get(&mut tx, &path).await?;
 
-  Ok(SpecificStar::from(star))
+  if !watch.unwrap_or(false) {
+    return Ok(Either::Left(SpecificStar::from(star)));
+  }
+
+  let client = Client::try_default().await?;
+  let api: Api<Deployment> = Api::namespaced(client, &format!("galaxy-{}", star.galaxy_id));
+  let config = watcher::Config::default().labels(&format!("star_id={}", star.id));
+
+  let stream = watcher(api, config).applied_objects().map(|deploy| {
+    deploy.map(|deploy| {
+      sse::Event::Data(
+        sse::Data::new_json(SpecificStar::status(
+          deploy.status.expect("missing status field from watcher"),
+        ))
+        .expect("Error serializing star status")
+        .event("status"),
+      )
+    })
+  });
+
+  let sse_stream = Sse::from_stream(stream);
+
+  Ok(Either::Right(sse_stream))
 }
 
 #[derive(Serialize, From, utoipa::ToResponse)]

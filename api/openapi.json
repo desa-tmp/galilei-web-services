@@ -630,6 +630,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "watch",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
           }
         ],
         "responses": {
@@ -1002,6 +1011,38 @@
           }
         }
       },
+      "StarStatus": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Active"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Failure"
+                ]
+              }
+            }
+          }
+        ]
+      },
       "UpdateGalaxyData": {
         "type": "object",
         "properties": {
@@ -1265,11 +1306,16 @@
         }
       },
       "SpecificStar": {
-        "description": "specific star",
+        "description": "specific star in the galaxy",
         "content": {
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Star"
+            }
+          },
+          "text/event-stream": {
+            "schema": {
+              "$ref": "#/components/schemas/StarStatus"
             }
           }
         }

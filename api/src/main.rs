@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{
   middleware::{Logger, NormalizePath},
   web, App, HttpServer,
@@ -24,9 +25,14 @@ async fn main() -> std::io::Result<()> {
     .expect("Unable connect to database");
 
   HttpServer::new(move || {
+    let cors = Cors::default()
+      .allowed_origin("http://localhost:3000")
+      .supports_credentials();
+
     App::new()
       .wrap(NormalizePath::trim())
       .wrap(TransactionService::new(Arc::clone(&pool)))
+      .wrap(cors)
       .configure(api::routes::auth::config)
       .service(
         web::scope("")

@@ -44,6 +44,9 @@ impl From<&Star> for Deployment {
           "star_id": star.id,
           "galaxy_id": star.galaxy_id,
         },
+        "annotasions": {
+          "kubernetes.io/change-cause": "gws api"
+        }
       },
       "spec": {
         "replicas": 1,

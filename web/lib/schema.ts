@@ -37,6 +37,7 @@ export const GalaxyDataSchema = z.object({
 }) satisfies ZodType<GalaxyData>;
 
 export type Star = components["schemas"]["Star"];
+export type StarStatus = components["schemas"]["StarStatus"];
 
 export type StarData = components["schemas"]["CreateStarData"];
 

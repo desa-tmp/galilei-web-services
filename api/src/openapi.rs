@@ -48,6 +48,7 @@ impl Modify for SecurityAddon {
     schemas(
       error::ErrorMessage,
       routes::auth::AuthData,
+      routes::star::StarStatus,
       models::user::User,
       auth::Password,
       models::user::Credentials,
