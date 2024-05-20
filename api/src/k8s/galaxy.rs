@@ -1,5 +1,5 @@
-use k8s_openapi::api::core::v1::Namespace;
-use kube::{api::Request, Client, Error, Result};
+use k8s_openapi::api::core::v1::{Namespace, Secret};
+use kube::{api::Request, Api, Client, Error, Result};
 use serde_json::{json, Value};
 
 use crate::models::galaxy::Galaxy;
@@ -25,6 +25,29 @@ impl From<&Galaxy> for Namespace {
   }
 }
 
+impl From<&Galaxy> for Secret {
+  fn from(value: &Galaxy) -> Self {
+    let tls_secret_replica = json!({
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "metadata": {
+        "name": "stars-tls-secret-replica",
+        "namespace": format!("galaxy-{}", value.id),
+        "annotations": {
+          "replicator.v1.mittwald.de/replicate-from": "cert-manager/stars-src-tls"
+        }
+      },
+      "type": "kubernetes.io/tls",
+      "data": {
+        "tls.key": "",
+        "tls.crt": "",
+      }
+    });
+
+    serde_json::from_value(tls_secret_replica).expect("Invalid tls secret replica")
+  }
+}
+
 impl ResourceBind for Galaxy {
   type RequestResolver = Client;
 
@@ -37,6 +60,12 @@ impl ResourceBind for Galaxy {
       .map_err(|err| Error::BuildRequest(err))?;
 
     let _: Namespace = client.request(req).await?;
+
+    let secrets: Api<Secret> = Api::namespaced(client, &format!("galaxy-{}", self.id));
+
+    let _ = secrets
+      .create(&Default::default(), &Secret::from(self))
+      .await?;
 
     Ok(())
   }

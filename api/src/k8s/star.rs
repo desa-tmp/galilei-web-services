@@ -138,10 +138,19 @@ impl From<&Star> for Ingress {
           "galaxy_id": star.galaxy_id,
         },
         "annotations": {
-          "ingress.kubernetes.io/ssl-redirect": "false"
+          "traefik.ingress.kubernetes.io/router.middlewares": "default-redirect@kubernetescrd",
+          "traefik.ingress.kubernetes.io/router.entrypoints": "web, websecure"
         }
       },
       "spec": {
+        "tls": [
+          {
+            "hosts": [
+              format!("{}.localhost", star.domain),
+            ],
+            "secretName": "stars-tls-secret-replica"
+          }
+        ],
         "rules": [
           {
             "host": format!("{}.localhost", star.domain),

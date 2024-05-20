@@ -12,11 +12,13 @@
   },
   "remoteEnv": {
     "CLUSTER_NAME": "${localEnv:CLUSTER_NAME:gws}",
-    "CLUSTER_PORT": "${localEnv:CLUSTER_PORT:80}",
+    "CLUSTER_HTTP": "${localEnv:CLUSTER_HTTP:80}",
+    "CLUSTER_HTTPS": "${localEnv:CLUSTER_HTTPS:443}"
   },
   "containerEnv": {
     "CLUSTER_NAME": "${remoteEnv:CLUSTER_NAME:gws}",
-    "CLUSTER_PORT": "${remoteEnv:CLUSTER_PORT:80}",
+    "CLUSTER_HTTP": "${remoteEnv:CLUSTER_HTTP:80}",
+    "CLUSTER_HTTPS": "${remoteEnv:CLUSTER_HTTPS:443}"
   },
   "postCreateCommand": "bash scripts/init-dev-env.sh",
   "postAttachCommand": {

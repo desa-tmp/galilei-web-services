@@ -1,6 +1,16 @@
 # create k3d cluster
-k3d cluster create $CLUSTER_NAME -p "${CLUSTER_PORT}:80@loadbalancer"
+k3d cluster create $CLUSTER_NAME -p "${CLUSTER_HTTP}:80@loadbalancer" -p "${CLUSTER_HTTPS}:443@loadbalancer"
 echo "export KUBECONFIG=\"$(k3d kubeconfig write gws)\"" >> ~/.bashrc
+
+helm repo add jetstack https://charts.jetstack.io --force-update
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
+kubectl apply -f k8s/cluster-selfsigned-issuer.yaml
+kubectl apply -f k8s/http-to-https-middleware.yaml
+
+helm repo add mittwald https://helm.mittwald.de
+helm repo update
+helm upgrade --install kubernetes-replicator mittwald/kubernetes-replicator
+kubectl apply -f k8s/stars-cert-src.yaml
 
 # install k8s dashboard
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/

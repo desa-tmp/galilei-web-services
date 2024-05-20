@@ -2,8 +2,15 @@
 k3d cluster delete $CLUSTER_NAME
 
 # create k3d cluster 
-k3d cluster create $CLUSTER_NAME -p "${CLUSTER_PORT}:80@loadbalancer"
+k3d cluster create $CLUSTER_NAME -p "${CLUSTER_HTTP}:80@loadbalancer" -p "${CLUSTER_HTTPS}:443@loadbalancer"
 k3d kubeconfig write gws
+
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
+kubectl apply -f k8s/cluster-selfsigned-issuer.yaml
+kubectl apply -f k8s/http-to-https-middleware.yaml
+
+helm upgrade --install kubernetes-replicator mittwald/kubernetes-replicator
+kubectl apply -f k8s/stars-cert-src.yaml
 
 helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
 
