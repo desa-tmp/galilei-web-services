@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO stars(name, nebula, galaxy_id) VALUES ($1, $2, $3) RETURNING *",
+  "query": "INSERT INTO stars(name, nebula, domain, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
   "describe": {
     "columns": [
       {
@@ -33,6 +33,7 @@
       "Left": [
         "Text",
         "Text",
+        "Text",
         "Uuid"
       ]
     },
@@ -44,5 +45,5 @@
       false
     ]
   },
-  "hash": "0944d8fa4b7807f1569495f5af50d18bdffecbdd28b3b073895bd55b2c407a35"
+  "hash": "1ae7fbeb65fd1727909f67d845d417fe830a06ffa1affeb648684a9eca17f393"
 }
