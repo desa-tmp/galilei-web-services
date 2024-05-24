@@ -63,6 +63,7 @@ impl From<&Star> for Deployment {
             },
           },
           "spec": {
+            "enableServiceLinks": false,
             "containers": [
               {
                 "name": format!("star-container-{}", star.id),

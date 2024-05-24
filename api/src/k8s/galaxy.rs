@@ -1,4 +1,7 @@
-use k8s_openapi::api::core::v1::{Namespace, Secret};
+use k8s_openapi::api::{
+  core::v1::{Namespace, Secret},
+  networking::v1::NetworkPolicy,
+};
 use kube::{api::Request, Api, Client, Error, Result};
 use serde_json::{json, Value};
 
@@ -48,6 +51,43 @@ impl From<&Galaxy> for Secret {
   }
 }
 
+impl From<&Galaxy> for NetworkPolicy {
+  fn from(galaxy: &Galaxy) -> Self {
+    let ns = format!("galaxy-{}", galaxy.id);
+
+    let net_policy = json!({
+      "kind": "NetworkPolicy",
+      "apiVersion": "networking.k8s.io/v1",
+      "metadata": {
+        "name": format!("net-policy-galaxy-{}", galaxy.id),
+        "namespace": &ns,
+      },
+      "spec": {
+        "podSelector": {},
+        "ingress": [
+          {
+            "from": [
+              {
+                "namespaceSelector": {
+                  "matchExpressions": [
+                    {
+                      "key": "kubernetes.io/metadata.name",
+                      "operator": "In",
+                      "values": ["kube-system", &ns]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    });
+
+    serde_json::from_value(net_policy).expect("Invalid Network Policy")
+  }
+}
+
 impl ResourceBind for Galaxy {
   type RequestResolver = Client;
 
@@ -61,10 +101,16 @@ impl ResourceBind for Galaxy {
 
     let _: Namespace = client.request(req).await?;
 
-    let secrets: Api<Secret> = Api::namespaced(client, &format!("galaxy-{}", self.id));
+    let secrets: Api<Secret> = Api::namespaced(client.clone(), &format!("galaxy-{}", self.id));
 
     let _ = secrets
       .create(&Default::default(), &Secret::from(self))
+      .await?;
+
+    let net_policies: Api<NetworkPolicy> = Api::namespaced(client, &format!("galaxy-{}", self.id));
+
+    let _ = net_policies
+      .create(&Default::default(), &NetworkPolicy::from(self))
       .await?;
 
     Ok(())
@@ -84,11 +130,28 @@ impl ResourceBind for Galaxy {
   }
 
   async fn delete(&self, client: Self::RequestResolver) -> Result<()> {
+    let name = format!("galaxy-{}", self.id);
+
     let req = Request::new(NAMESPACE_BASE_PATH)
-      .delete(&format!("galaxy-{}", self.id), &Default::default())
+      .delete(&name, &Default::default())
       .map_err(|err| Error::BuildRequest(err))?;
 
     let _: Value = client.request(req).await?;
+
+    let secrets: Api<Secret> = Api::namespaced(client.clone(), &name);
+
+    let _ = secrets
+      .delete("stars-tls-secret-replica", &Default::default())
+      .await?;
+
+    let net_policies: Api<NetworkPolicy> = Api::namespaced(client, &name);
+
+    let _ = net_policies
+      .delete(
+        &format!("net-policy-galaxy-{}", self.id),
+        &Default::default(),
+      )
+      .await?;
 
     Ok(())
   }
