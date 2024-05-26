@@ -15,6 +15,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { z } from "zod";
 import { updateStar } from "@/lib/actions";
+import CopyBtn from "./copy-btn";
 
 const NetworkStarDataSchema = StarDataSchema.pick({
   public_domain: true,
@@ -51,9 +52,20 @@ export default function NetworkStarForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Public Domain</FormLabel>
-              <FormControl>
-                <Input type="text" autoComplete="off" {...field} />
-              </FormControl>
+              <div className="flex items-center gap-4">
+                <FormControl>
+                  <Input
+                    type="text"
+                    autoComplete="off"
+                    className="flex-1"
+                    {...field}
+                  />
+                </FormControl>
+                <CopyBtn
+                  text={`${field.value}.localhost`}
+                  disabled={field.value.length === 0}
+                />
+              </div>
               <FormMessage />
             </FormItem>
           )}
