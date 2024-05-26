@@ -1,10 +1,7 @@
 import StarStatus from "@/components/StarStatus";
 import ActionBtn from "@/components/action-btn";
-import CopyBtn from "@/components/copy-btn";
 import GenericStarForm from "@/components/generic-star-form";
 import NetworkStarForm from "@/components/network-star-form";
-import { Label } from "@/components/ui/label";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { deleteStar } from "@/lib/actions";
 import { api } from "@/lib/api";
@@ -33,8 +30,6 @@ export default async function StarPage({
   if (error) {
     throw new ApiError(error);
   }
-
-  const privateDomain = `star-${star_id}.galaxy-${galaxy_id}.svc.cluster.local`;
 
   return (
     <div className="flex size-full flex-col gap-4">
@@ -65,16 +60,6 @@ export default async function StarPage({
             starId={star_id}
             networkData={{ public_domain: star.public_domain ?? "" }}
           />
-          <div className="mt-4 space-y-2">
-            <Label>Private Domain</Label>
-            <div className="flex items-center gap-4">
-              <ScrollArea className="flex-1 px-2 py-1">
-                <span className="text-nowrap">{privateDomain}</span>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-              <CopyBtn text={privateDomain} />
-            </div>
-          </div>
         </TabsContent>
       </Tabs>
       <ActionBtn

@@ -16,6 +16,8 @@ import { Button } from "./ui/button";
 import { z } from "zod";
 import { updateStar } from "@/lib/actions";
 import CopyBtn from "./copy-btn";
+import { Label } from "./ui/label";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 const NetworkStarDataSchema = StarDataSchema.pick({
   public_domain: true,
@@ -42,6 +44,8 @@ export default function NetworkStarForm({
   async function onSubmit(data: NetworkStarData) {
     await updateStar(galaxyId, starId, data);
   }
+
+  const privateDomain = `star-${starId}.galaxy-${galaxyId}.svc.cluster.local`;
 
   return (
     <Form {...form}>
@@ -70,6 +74,16 @@ export default function NetworkStarForm({
             </FormItem>
           )}
         />
+        <div className="space-y-2">
+          <Label>Private Domain</Label>
+          <div className="flex items-center gap-4">
+            <ScrollArea className="flex-1 px-2 py-1">
+              <span className="text-nowrap">{privateDomain}</span>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+            <CopyBtn text={privateDomain} />
+          </div>
+        </div>
         <Button
           type="submit"
           className="w-full"
