@@ -1,6 +1,6 @@
 "use client";
 
-import { StarData, StarDataSchema } from "@/lib/schema";
+import { StarDataSchema } from "@/lib/schema";
 import {
   Form,
   FormControl,
@@ -13,27 +13,34 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { z } from "zod";
+import { updateStar } from "@/lib/actions";
 
-interface StarFormProps {
-  // eslint-disable-next-line no-unused-vars
-  action: (data: StarData) => Promise<void>;
-  star?: StarData;
+const GenericStarDataSchema = StarDataSchema.pick({
+  name: true,
+  nebula: true,
+});
+
+type GenericStarData = z.infer<typeof GenericStarDataSchema>;
+
+interface GenericStarFormProps {
+  galaxyId: string;
+  starId: string;
+  genericData: GenericStarData;
 }
 
-const EMPTY_STAR: StarData = {
-  name: "",
-  nebula: "",
-  public_domain: "",
-};
-
-export default function StarForm({ action, star }: StarFormProps) {
-  const form = useForm<StarData>({
-    resolver: zodResolver(StarDataSchema),
-    defaultValues: { ...EMPTY_STAR, ...star },
+export default function GenericStarForm({
+  galaxyId,
+  starId,
+  genericData,
+}: GenericStarFormProps) {
+  const form = useForm<GenericStarData>({
+    resolver: zodResolver(GenericStarDataSchema),
+    defaultValues: { ...genericData },
   });
 
-  async function onSubmit(data: StarData) {
-    await action(data);
+  async function onSubmit(data: GenericStarData) {
+    await updateStar(galaxyId, starId, data);
   }
 
   return (
@@ -65,25 +72,12 @@ export default function StarForm({ action, star }: StarFormProps) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="public_domain"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Public Domain</FormLabel>
-              <FormControl>
-                <Input type="text" autoComplete="off" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <Button
           type="submit"
           className="w-full"
           loading={form.formState.isSubmitting}
         >
-          Submit
+          Update
         </Button>
       </form>
     </Form>

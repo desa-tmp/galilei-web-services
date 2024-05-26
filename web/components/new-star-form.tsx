@@ -13,27 +13,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { newStar } from "@/lib/actions";
+import { DialogFooter } from "./ui/dialog";
 
-interface StarFormProps {
-  // eslint-disable-next-line no-unused-vars
-  action: (data: StarData) => Promise<void>;
-  star?: StarData;
+export interface NewStarFormProps {
+  galaxyId: string;
 }
 
-const EMPTY_STAR: StarData = {
-  name: "",
-  nebula: "",
-  public_domain: "",
-};
-
-export default function StarForm({ action, star }: StarFormProps) {
+export default function NewStarForm({ galaxyId }: NewStarFormProps) {
   const form = useForm<StarData>({
     resolver: zodResolver(StarDataSchema),
-    defaultValues: { ...EMPTY_STAR, ...star },
+    defaultValues: {
+      name: "",
+      nebula: "",
+      public_domain: "",
+    },
   });
 
   async function onSubmit(data: StarData) {
-    await action(data);
+    await newStar(galaxyId, data);
   }
 
   return (
@@ -78,13 +76,11 @@ export default function StarForm({ action, star }: StarFormProps) {
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          className="w-full"
-          loading={form.formState.isSubmitting}
-        >
-          Submit
-        </Button>
+        <DialogFooter>
+          <Button type="submit" loading={form.formState.isSubmitting}>
+            Create
+          </Button>
+        </DialogFooter>
       </form>
     </Form>
   );

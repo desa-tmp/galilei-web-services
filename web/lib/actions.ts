@@ -11,6 +11,10 @@ import {
   RegisterSchema,
   StarData,
   StarDataSchema,
+  UpdateStarData,
+  UpdateStarDataSchema,
+  UpdatePlanetData,
+  UpdatePlanetDataSchema,
 } from "./schema";
 import { api } from "./api";
 import { revalidateTag } from "next/cache";
@@ -97,11 +101,18 @@ export async function deleteGalaxy(galaxy_id: string) {
 export async function newStar(galaxyId: string, data: StarData) {
   const starData = StarDataSchema.parse(data);
 
+  const { public_domain, ...rest } = starData;
+
   const { error, data: star } = await api.POST("/galaxies/{galaxy_id}/stars", {
     params: {
       path: { galaxy_id: galaxyId },
     },
-    body: starData,
+    body: {
+      ...rest,
+      public_domain: {
+        subdomain: public_domain.length === 0 ? null : public_domain,
+      },
+    },
   });
 
   if (error) {
@@ -115,15 +126,25 @@ export async function newStar(galaxyId: string, data: StarData) {
 export async function updateStar(
   galaxyId: string,
   starId: string,
-  data: StarData
+  data: UpdateStarData
 ) {
-  const starData = StarDataSchema.parse(data);
+  const starData = UpdateStarDataSchema.parse(data);
+
+  const { public_domain, ...rest } = starData;
 
   const { error } = await api.PUT("/galaxies/{galaxy_id}/stars/{star_id}", {
     params: {
       path: { galaxy_id: galaxyId, star_id: starId },
     },
-    body: starData,
+    body: {
+      ...rest,
+      public_domain:
+        public_domain != undefined
+          ? {
+              subdomain: public_domain.length === 0 ? null : public_domain,
+            }
+          : null,
+    },
   });
 
   if (error) {
@@ -175,15 +196,21 @@ export async function newPlanet(galaxyId: string, data: PlanetData) {
 export async function updatePlanet(
   galaxyId: string,
   planetId: string,
-  data: PlanetData
+  data: UpdatePlanetData
 ) {
-  const { star_id, ...rest } = PlanetDataSchema.parse(data);
+  const { star_id, ...rest } = UpdatePlanetDataSchema.parse(data);
 
   const { error } = await api.PUT("/galaxies/{galaxy_id}/planets/{planet_id}", {
     params: {
       path: { galaxy_id: galaxyId, planet_id: planetId },
     },
-    body: { ...rest, star: { id: star_id.length === 0 ? null : star_id } },
+    body: {
+      ...rest,
+      star:
+        star_id != undefined
+          ? { id: star_id.length === 0 ? null : star_id }
+          : null,
+    },
   });
 
   if (error) {

@@ -39,7 +39,12 @@ export const GalaxyDataSchema = z.object({
 export type Star = components["schemas"]["Star"];
 export type StarStatus = components["schemas"]["StarStatus"];
 
-export type StarData = components["schemas"]["CreateStarData"];
+export type StarData = Omit<
+  components["schemas"]["CreateStarData"],
+  "public_domain"
+> & {
+  public_domain: string;
+};
 
 export const StarDataSchema = z.object({
   name: z.string().min(1, {
@@ -48,10 +53,18 @@ export const StarDataSchema = z.object({
   nebula: z.string().min(1, {
     message: "Star nebula is required",
   }),
-  domain: z.string().min(1, {
-    message: "Star domain is required",
-  }),
+  public_domain: z.string(),
 }) satisfies ZodType<StarData>;
+
+export type UpdateStarData = Omit<
+  components["schemas"]["UpdateStarData"],
+  "public_domain"
+> & {
+  public_domain?: string;
+};
+
+export const UpdateStarDataSchema =
+  StarDataSchema.partial() satisfies ZodType<UpdateStarData>;
 
 export type Planet = components["schemas"]["Planet"];
 
@@ -74,3 +87,13 @@ export const PlanetDataSchema = z.object({
   }),
   star_id: z.string(),
 }) satisfies ZodType<PlanetData>;
+
+export type UpdatePlanetData = Omit<
+  components["schemas"]["UpdatePlanetData"],
+  "star"
+> & {
+  star_id?: string;
+};
+
+export const UpdatePlanetDataSchema =
+  PlanetDataSchema.partial() satisfies ZodType<UpdatePlanetData>;

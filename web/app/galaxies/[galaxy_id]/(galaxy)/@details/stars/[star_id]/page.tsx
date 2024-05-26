@@ -1,7 +1,9 @@
 import StarStatus from "@/components/StarStatus";
 import ActionBtn from "@/components/action-btn";
-import StarForm from "@/components/star-form";
-import { deleteStar, updateStar } from "@/lib/actions";
+import GenericStarForm from "@/components/generic-star-form";
+import NetworkStarForm from "@/components/network-star-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { deleteStar } from "@/lib/actions";
 import { api } from "@/lib/api";
 import { Star } from "@/lib/schema";
 import { Page } from "@/lib/types";
@@ -36,10 +38,30 @@ export default async function StarPage({
         <h1 className="text-2xl font-bold">{star.name}</h1>
       </header>
       <StarStatus galaxy_id={galaxy_id} star_id={star_id} withLabel />
-      <StarForm
-        action={updateStar.bind(null, galaxy_id, star_id)}
-        star={star}
-      />
+      <Tabs defaultValue="generic">
+        <TabsList className="w-full">
+          <TabsTrigger value="generic" className="flex-1">
+            Generic
+          </TabsTrigger>
+          <TabsTrigger value="network" className="flex-1">
+            Network
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="generic">
+          <GenericStarForm
+            galaxyId={galaxy_id}
+            starId={star_id}
+            genericData={star}
+          />
+        </TabsContent>
+        <TabsContent value="network">
+          <NetworkStarForm
+            galaxyId={galaxy_id}
+            starId={star_id}
+            networkData={{ public_domain: star.public_domain ?? "" }}
+          />
+        </TabsContent>
+      </Tabs>
       <ActionBtn
         variant="destructive"
         className="mt-auto"

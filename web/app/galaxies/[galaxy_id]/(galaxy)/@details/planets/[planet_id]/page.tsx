@@ -1,6 +1,8 @@
 import ActionBtn from "@/components/action-btn";
-import PlanetForm from "@/components/planet-form";
-import { deletePlanet, updatePlanet } from "@/lib/actions";
+import GenericPlanetForm from "@/components/generic-planet-form";
+import StoragePlanetForm from "@/components/storage-planet-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { deletePlanet } from "@/lib/actions";
 import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
 import { ApiError } from "api-client";
@@ -39,11 +41,34 @@ export default async function PlanetPage({
         <Earth />
         <h1 className="text-2xl font-bold">{planet.name}</h1>
       </header>
-      <PlanetForm
-        action={updatePlanet.bind(null, galaxy_id, planet_id)}
-        stars={stars}
-        planet={{ ...planet, star_id: planet.star_id ?? "" }}
-      />
+      <Tabs defaultValue="generic">
+        <TabsList className="w-full">
+          <TabsTrigger value="generic" className="flex-1">
+            Generic
+          </TabsTrigger>
+          <TabsTrigger value="storage" className="flex-1">
+            Storage
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="generic">
+          <GenericPlanetForm
+            galaxyId={galaxy_id}
+            planetId={planet_id}
+            stars={stars}
+            genericData={{
+              name: planet.name,
+              star_id: planet.star_id ?? "",
+            }}
+          />
+        </TabsContent>
+        <TabsContent value="storage">
+          <StoragePlanetForm
+            galaxyId={galaxy_id}
+            planetId={planet_id}
+            storageData={planet}
+          />
+        </TabsContent>
+      </Tabs>
       <ActionBtn
         variant="destructive"
         className="mt-auto"

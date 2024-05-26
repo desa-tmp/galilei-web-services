@@ -1,6 +1,6 @@
 "use client";
 
-import { StarData, StarDataSchema } from "@/lib/schema";
+import { PlanetDataSchema } from "@/lib/schema";
 import {
   Form,
   FormControl,
@@ -13,27 +13,34 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { z } from "zod";
+import { updatePlanet } from "@/lib/actions";
 
-interface StarFormProps {
-  // eslint-disable-next-line no-unused-vars
-  action: (data: StarData) => Promise<void>;
-  star?: StarData;
+const StoragePlanetDataSchema = PlanetDataSchema.pick({
+  path: true,
+  capacity: true,
+});
+
+type StoragePlanetData = z.infer<typeof StoragePlanetDataSchema>;
+
+interface PlanetFormProps {
+  galaxyId: string;
+  planetId: string;
+  storageData: StoragePlanetData;
 }
 
-const EMPTY_STAR: StarData = {
-  name: "",
-  nebula: "",
-  public_domain: "",
-};
-
-export default function StarForm({ action, star }: StarFormProps) {
-  const form = useForm<StarData>({
-    resolver: zodResolver(StarDataSchema),
-    defaultValues: { ...EMPTY_STAR, ...star },
+export default function StoragePlanetForm({
+  galaxyId,
+  planetId,
+  storageData,
+}: PlanetFormProps) {
+  const form = useForm<StoragePlanetData>({
+    resolver: zodResolver(StoragePlanetDataSchema),
+    defaultValues: { ...storageData },
   });
 
-  async function onSubmit(data: StarData) {
-    await action(data);
+  async function onSubmit(data: StoragePlanetData) {
+    await updatePlanet(galaxyId, planetId, data);
   }
 
   return (
@@ -41,10 +48,10 @@ export default function StarForm({ action, star }: StarFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="name"
+          name="path"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Path</FormLabel>
               <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
               </FormControl>
@@ -54,25 +61,12 @@ export default function StarForm({ action, star }: StarFormProps) {
         />
         <FormField
           control={form.control}
-          name="nebula"
+          name="capacity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nebula</FormLabel>
+              <FormLabel>Capacity</FormLabel>
               <FormControl>
-                <Input type="text" autoComplete="off" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="public_domain"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Public Domain</FormLabel>
-              <FormControl>
-                <Input type="text" autoComplete="off" {...field} />
+                <Input type="number" autoComplete="off" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +77,7 @@ export default function StarForm({ action, star }: StarFormProps) {
           className="w-full"
           loading={form.formState.isSubmitting}
         >
-          Submit
+          Update
         </Button>
       </form>
     </Form>

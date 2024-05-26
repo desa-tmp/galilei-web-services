@@ -5,6 +5,15 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { ApiError } from "api-client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import NewStarForm from "./new-star-form";
+import NewPlanetForm from "./new-planet-form";
 
 interface GalaxyProps {
   galaxy_id: string;
@@ -30,18 +39,34 @@ export default async function Galaxy({ galaxy_id }: GalaxyProps) {
           <h1 className="text-2xl font-bold">{galaxy.name}</h1>
         </div>
         <div className="flex items-center gap-4">
-          <Button className="flex gap-2" asChild>
-            <Link href={`/galaxies/${galaxy.id}/stars/new`}>
-              <Plus className="size-4" />
-              <span>New Star</span>
-            </Link>
-          </Button>
-          <Button className="flex gap-2" asChild>
-            <Link href={`/galaxies/${galaxy.id}/planets/new`}>
-              <Plus className="size-4" />
-              <span>New Planet</span>
-            </Link>
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="flex gap-2">
+                <Plus className="size-4" />
+                <span>New Star</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>New Star</DialogTitle>
+              </DialogHeader>
+              <NewStarForm galaxyId={galaxy_id} />
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="flex gap-2">
+                <Plus className="size-4" />
+                <span>New Planet</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>New Planet</DialogTitle>
+              </DialogHeader>
+              <NewPlanetForm galaxyId={galaxy_id} stars={stars} />
+            </DialogContent>
+          </Dialog>
           <Button variant="ghost" size="icon" asChild>
             <Link href={`/galaxies/${galaxy.id}/settings`}>
               <Settings />
