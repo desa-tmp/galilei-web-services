@@ -18,8 +18,15 @@ pub struct Star {
   #[schema(format = Uri)]
   pub nebula: String,
   #[schema(min_length = 1)]
-  pub domain: String,
+  pub public_domain: Option<String>,
   pub galaxy_id: Uuid,
+}
+
+#[derive(Debug, Deserialize, Validate, ToSchema)]
+pub struct PublicDomain {
+  #[schema(min_length = 1)]
+  #[validate(length(min = 1, message = "cannot be empty"))]
+  subdomain: Option<String>,
 }
 
 gen_update_data! {
@@ -32,9 +39,8 @@ gen_update_data! {
     #[schema(format = Uri)]
     #[validate(length(min = 1, message = "cannot be empty"))]
     nebula: String,
-    #[schema(format = Uri)]
-    #[validate(length(min = 1, message = "cannot be empty"))]
-    domain: String,
+    #[validate(nested)]
+    public_domain: PublicDomain,
   }
 }
 
@@ -83,15 +89,15 @@ impl CrudOperations for Star {
     let CreateStarData {
       name,
       nebula,
-      domain,
+      public_domain,
     } = data;
 
     let new_star = sqlx::query_as!(
       Star,
-      "INSERT INTO stars(name, nebula, domain, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      "INSERT INTO stars(name, nebula, public_domain, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
       name,
       nebula,
-      domain,
+      public_domain.subdomain,
       galaxy_id
     )
     .fetch_one(conn)
@@ -108,8 +114,14 @@ impl CrudOperations for Star {
     let UpdateStarData {
       name,
       nebula,
-      domain,
+      public_domain,
     } = data;
+
+    let update_public_domain = public_domain.is_some();
+    let public_domain = public_domain
+      .as_ref()
+      .map(|dom| dom.subdomain.as_ref())
+      .unwrap_or(None);
 
     let updated_star = sqlx::query_as!(
       Star,
@@ -117,13 +129,14 @@ impl CrudOperations for Star {
       UPDATE stars
       SET name = COALESCE($1, name),
         nebula = COALESCE($2, nebula),
-        domain = COALESCE($3, domain)
-      WHERE galaxy_id = $4 AND id = $5
+        public_domain = (CASE WHEN $3 = true THEN $4 ELSE public_domain END)
+      WHERE galaxy_id = $5 AND id = $6
       RETURNING *
     "#,
       name.as_deref(),
       nebula.as_deref(),
-      domain.as_deref(),
+      update_public_domain,
+      public_domain,
       galaxy_id,
       star_id
     )

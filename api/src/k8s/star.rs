@@ -127,6 +127,11 @@ impl From<&Star> for Service {
 
 impl From<&Star> for Ingress {
   fn from(star: &Star) -> Self {
+    let public_domain = star
+      .public_domain
+      .as_ref()
+      .expect("Public domain not found when creating ingress");
+
     let ingress = json!({
       "apiVersion": "networking.k8s.io/v1",
       "kind": "Ingress",
@@ -147,14 +152,14 @@ impl From<&Star> for Ingress {
         "tls": [
           {
             "hosts": [
-              format!("{}.localhost", star.domain),
+              format!("{}.localhost", public_domain),
             ],
             "secretName": "stars-tls-secret-replica"
           }
         ],
         "rules": [
           {
-            "host": format!("{}.localhost", star.domain),
+            "host": format!("{}.localhost", public_domain),
             "http": {
               "paths": [
                 {
@@ -194,10 +199,12 @@ impl ResourceBind for Star {
       .create(&Default::default(), &Service::from(self))
       .await?;
 
-    let _ = api
-      .ingress
-      .create(&Default::default(), &Ingress::from(self))
-      .await?;
+    if self.public_domain.is_some() {
+      let _ = api
+        .ingress
+        .create(&Default::default(), &Ingress::from(self))
+        .await?;
+    }
 
     Ok(())
   }
@@ -216,10 +223,23 @@ impl ResourceBind for Star {
       .replace(&k8s_name, &pp, &Service::from(self))
       .await?;
 
-    let _ = api
-      .ingress
-      .replace(&k8s_name, &pp, &Ingress::from(self))
-      .await?;
+    if api.ingress.get_opt(&k8s_name).await?.is_some() {
+      if self.public_domain.is_some() {
+        let _ = api
+          .ingress
+          .replace(&k8s_name, &pp, &Ingress::from(self))
+          .await?;
+      } else {
+        let _ = api.ingress.delete(&k8s_name, &Default::default()).await?;
+      }
+    } else {
+      if self.public_domain.is_some() {
+        let _ = api
+          .ingress
+          .create(&Default::default(), &Ingress::from(self))
+          .await?;
+      }
+    }
 
     Ok(())
   }

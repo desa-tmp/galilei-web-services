@@ -20,7 +20,7 @@
       },
       {
         "ordinal": 3,
-        "name": "domain",
+        "name": "public_domain",
         "type_info": "Text"
       },
       {
@@ -38,7 +38,7 @@
       false,
       false,
       false,
-      false,
+      true,
       false
     ]
   },

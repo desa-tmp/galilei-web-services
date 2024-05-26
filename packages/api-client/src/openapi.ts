@@ -78,11 +78,10 @@ export interface components {
       star: components["schemas"]["ConnectPlanetToStar"];
     };
     CreateStarData: {
-      /** Format: uri */
-      domain: string;
       name: string;
       /** Format: uri */
       nebula: string;
+      public_domain: components["schemas"]["PublicDomain"];
     };
     Credentials: components["schemas"]["Password"] & {
       username: string;
@@ -114,8 +113,10 @@ export interface components {
       /** Format: uuid */
       star_id?: string | null;
     };
+    PublicDomain: {
+      subdomain?: string | null;
+    };
     Star: {
-      domain: string;
       /** Format: uuid */
       galaxy_id: string;
       /** Format: uuid */
@@ -123,6 +124,7 @@ export interface components {
       name: string;
       /** Format: uri */
       nebula: string;
+      public_domain?: string | null;
     };
     StarStatus: OneOf<[{
       /** @enum {string} */
@@ -142,11 +144,10 @@ export interface components {
       star?: components["schemas"]["ConnectPlanetToStar"] | null;
     };
     UpdateStarData: {
-      /** Format: uri */
-      domain?: string | null;
       name?: string | null;
       /** Format: uri */
       nebula?: string | null;
+      public_domain?: components["schemas"]["PublicDomain"] | null;
     };
     User: {
       /** Format: uuid */

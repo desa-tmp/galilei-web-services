@@ -855,13 +855,9 @@
         "required": [
           "name",
           "nebula",
-          "domain"
+          "public_domain"
         ],
         "properties": {
-          "domain": {
-            "type": "string",
-            "format": "uri"
-          },
           "name": {
             "type": "string",
             "minLength": 1
@@ -869,6 +865,9 @@
           "nebula": {
             "type": "string",
             "format": "uri"
+          },
+          "public_domain": {
+            "$ref": "#/components/schemas/PublicDomain"
           }
         }
       },
@@ -979,20 +978,25 @@
           }
         }
       },
+      "PublicDomain": {
+        "type": "object",
+        "properties": {
+          "subdomain": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
+          }
+        }
+      },
       "Star": {
         "type": "object",
         "required": [
           "id",
           "name",
           "nebula",
-          "domain",
           "galaxy_id"
         ],
         "properties": {
-          "domain": {
-            "type": "string",
-            "minLength": 1
-          },
           "galaxy_id": {
             "type": "string",
             "format": "uuid"
@@ -1008,6 +1012,11 @@
           "nebula": {
             "type": "string",
             "format": "uri"
+          },
+          "public_domain": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
           }
         }
       },
@@ -1086,11 +1095,6 @@
       "UpdateStarData": {
         "type": "object",
         "properties": {
-          "domain": {
-            "type": "string",
-            "format": "uri",
-            "nullable": true
-          },
           "name": {
             "type": "string",
             "nullable": true,
@@ -1099,6 +1103,14 @@
           "nebula": {
             "type": "string",
             "format": "uri",
+            "nullable": true
+          },
+          "public_domain": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicDomain"
+              }
+            ],
             "nullable": true
           }
         }
