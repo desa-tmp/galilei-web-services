@@ -29,8 +29,6 @@ impl StarRequestResolver {
   }
 }
 
-const PORT: i32 = 80;
-
 impl From<&Star> for Deployment {
   fn from(star: &Star) -> Self {
     let deployment = json!({
@@ -75,12 +73,20 @@ impl From<&Star> for Deployment {
                   },
                   {
                     "name": "PORT",
-                    "value": PORT.to_string()
+                    "value": star.port.to_string()
+                  },
+                  {
+                    "name": "POSTGRES_USER",
+                    "value": "postgres"
+                  },
+                  {
+                    "name": "POSTGRES_PASSWORD",
+                    "value": "postgres"
                   }
                 ],
                 "ports": [
                   {
-                    "containerPort": PORT
+                    "containerPort": star.port
                   }
                 ]
               }
@@ -114,8 +120,8 @@ impl From<&Star> for Service {
         },
         "ports": [
           {
-            "port": PORT,
-            "targetPort": PORT,
+            "port": star.port,
+            "targetPort": star.port,
           },
         ],
       },
@@ -169,7 +175,7 @@ impl From<&Star> for Ingress {
                     "service": {
                       "name": format!("star-{}", star.id),
                       "port": {
-                        "number": PORT
+                        "number": star.port,
                       }
                     }
                   }

@@ -81,6 +81,8 @@ export interface components {
       name: string;
       /** Format: uri */
       nebula: string;
+      /** Format: int32 */
+      port: number;
       public_domain: components["schemas"]["PublicDomain"];
     };
     Credentials: components["schemas"]["Password"] & {
@@ -124,6 +126,8 @@ export interface components {
       name: string;
       /** Format: uri */
       nebula: string;
+      /** Format: int32 */
+      port: number;
       public_domain?: string | null;
     };
     StarStatus: OneOf<[{
@@ -147,6 +151,8 @@ export interface components {
       name?: string | null;
       /** Format: uri */
       nebula?: string | null;
+      /** Format: int32 */
+      port?: number | null;
       public_domain?: components["schemas"]["PublicDomain"] | null;
     };
     User: {

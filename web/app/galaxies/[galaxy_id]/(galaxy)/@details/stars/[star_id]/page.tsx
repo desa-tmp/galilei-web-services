@@ -58,7 +58,7 @@ export default async function StarPage({
           <NetworkStarForm
             galaxyId={galaxy_id}
             starId={star_id}
-            networkData={{ public_domain: star.public_domain ?? "" }}
+            networkData={{ ...star, public_domain: star.public_domain ?? "" }}
           />
         </TabsContent>
       </Tabs>
