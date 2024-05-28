@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { Star } from "@/lib/schema";
 import { Page } from "@/lib/types";
 import { ApiError } from "api-client";
-import { Star as StarIcon } from "lucide-react";
+import { Star as StarIcon, Trash2 } from "lucide-react";
 
 type StarPageProps = Page<{ galaxy_id: string; star_id: string }>;
 
@@ -33,9 +33,18 @@ export default async function StarPage({
 
   return (
     <div className="flex size-full flex-col gap-4">
-      <header className="flex items-center gap-4">
-        <StarIcon />
-        <h1 className="text-2xl font-bold">{star.name}</h1>
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <StarIcon />
+          <h1 className="text-2xl font-bold">{star.name}</h1>
+        </div>
+        <ActionBtn
+          variant="destructive"
+          size="icon"
+          action={deleteStar.bind(null, galaxy_id, star_id)}
+        >
+          <Trash2 />
+        </ActionBtn>
       </header>
       <StarStatus galaxy_id={galaxy_id} star_id={star_id} withLabel />
       <Tabs defaultValue="generic">
@@ -62,13 +71,6 @@ export default async function StarPage({
           />
         </TabsContent>
       </Tabs>
-      <ActionBtn
-        variant="destructive"
-        className="mt-auto"
-        action={deleteStar.bind(null, galaxy_id, star_id)}
-      >
-        Delete Star
-      </ActionBtn>
     </div>
   );
 }
