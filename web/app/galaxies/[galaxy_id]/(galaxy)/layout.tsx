@@ -11,7 +11,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 export default function GalaxyLayout({ children, details }: Layout<"details">) {
   const segment = useSelectedLayoutSegment("details");
   const galaxyPanelDefaultSize = segment === "children" ? 60 : 100;
-
+  console.log(segment);
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel

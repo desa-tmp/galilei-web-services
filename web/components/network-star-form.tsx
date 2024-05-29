@@ -21,6 +21,7 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 const NetworkStarDataSchema = StarDataSchema.pick({
   public_domain: true,
+  port: true,
 });
 
 type NetworkStarData = z.infer<typeof NetworkStarDataSchema>;
@@ -84,6 +85,19 @@ export default function NetworkStarForm({
             <CopyBtn text={privateDomain} />
           </div>
         </div>
+        <FormField
+          control={form.control}
+          name="port"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Internal port</FormLabel>
+              <FormControl>
+                <Input type="number" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button
           type="submit"
           className="w-full"

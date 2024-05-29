@@ -855,7 +855,8 @@
         "required": [
           "name",
           "nebula",
-          "public_domain"
+          "public_domain",
+          "port"
         ],
         "properties": {
           "name": {
@@ -865,6 +866,12 @@
           "nebula": {
             "type": "string",
             "format": "uri"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 65535,
+            "minimum": 1
           },
           "public_domain": {
             "$ref": "#/components/schemas/PublicDomain"
@@ -994,6 +1001,7 @@
           "id",
           "name",
           "nebula",
+          "port",
           "galaxy_id"
         ],
         "properties": {
@@ -1012,6 +1020,12 @@
           "nebula": {
             "type": "string",
             "format": "uri"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 65535,
+            "minimum": 0
           },
           "public_domain": {
             "type": "string",
@@ -1104,6 +1118,13 @@
             "type": "string",
             "format": "uri",
             "nullable": true
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "maximum": 65535,
+            "minimum": 1
           },
           "public_domain": {
             "allOf": [

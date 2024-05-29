@@ -19,6 +19,8 @@ pub struct Star {
   pub nebula: String,
   #[schema(min_length = 1)]
   pub public_domain: Option<String>,
+  #[schema(minimum = 0, maximum = 65535)]
+  pub port: i32,
   pub galaxy_id: Uuid,
 }
 
@@ -41,6 +43,9 @@ gen_update_data! {
     nebula: String,
     #[validate(nested)]
     public_domain: PublicDomain,
+    #[schema(minimum = 1, maximum = 65535)]
+    #[validate(range(min = 1, max = 65535))]
+    port: i32,
   }
 }
 
@@ -90,14 +95,22 @@ impl CrudOperations for Star {
       name,
       nebula,
       public_domain,
+      port,
     } = data;
 
     let new_star = sqlx::query_as!(
       Star,
-      "INSERT INTO stars(name, nebula, public_domain, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      r#"INSERT INTO stars(
+        name,
+        nebula,
+        public_domain,
+        port,
+        galaxy_id
+      ) VALUES ($1, $2, $3, $4, $5) RETURNING *"#,
       name,
       nebula,
       public_domain.subdomain,
+      port,
       galaxy_id
     )
     .fetch_one(conn)
@@ -115,6 +128,7 @@ impl CrudOperations for Star {
       name,
       nebula,
       public_domain,
+      port,
     } = data;
 
     let update_public_domain = public_domain.is_some();
@@ -129,14 +143,16 @@ impl CrudOperations for Star {
       UPDATE stars
       SET name = COALESCE($1, name),
         nebula = COALESCE($2, nebula),
-        public_domain = (CASE WHEN $3 = true THEN $4 ELSE public_domain END)
-      WHERE galaxy_id = $5 AND id = $6
+        public_domain = (CASE WHEN $3 = true THEN $4 ELSE public_domain END),
+        port = COALESCE($5, port)
+      WHERE galaxy_id = $6 AND id = $7
       RETURNING *
     "#,
       name.as_deref(),
       nebula.as_deref(),
       update_public_domain,
       public_domain,
+      port.as_ref(),
       galaxy_id,
       star_id
     )

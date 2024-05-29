@@ -54,6 +54,7 @@ export const StarDataSchema = z.object({
     message: "Star nebula is required",
   }),
   public_domain: z.string(),
+  port: z.coerce.number({ message: "invalid port number" }).min(1).max(65535),
 }) satisfies ZodType<StarData>;
 
 export type UpdateStarData = Omit<
