@@ -15,6 +15,8 @@ import {
   UpdateStarDataSchema,
   UpdatePlanetData,
   UpdatePlanetDataSchema,
+  StarVariableData,
+  StarVariableDataSchema,
 } from "./schema";
 import { api } from "./api";
 import { revalidateTag } from "next/cache";
@@ -170,6 +172,55 @@ export async function deleteStar(galaxyId: string, starId: string) {
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${galaxyId}`);
+}
+
+export async function addStarVariable(
+  galaxyId: string,
+  starId: string,
+  data: StarVariableData
+) {
+  const varData = StarVariableDataSchema.parse(data);
+
+  const { error } = await api.POST(
+    "/galaxies/{galaxy_id}/stars/{star_id}/vars",
+    {
+      params: {
+        path: {
+          galaxy_id: galaxyId,
+          star_id: starId,
+        },
+      },
+      body: varData,
+    }
+  );
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  revalidateTag("enviroment");
+}
+
+export async function deleteStarVariable(
+  galaxyId: string,
+  starId: string,
+  varId: string
+) {
+  console.log(varId);
+  const { error } = await api.DELETE(
+    "/galaxies/{galaxy_id}/stars/{star_id}/vars/{variable_id}",
+    {
+      params: {
+        path: { galaxy_id: galaxyId, star_id: starId, variable_id: varId },
+      },
+    }
+  );
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  revalidateTag("enviroment");
 }
 
 export async function newPlanet(galaxyId: string, data: PlanetData) {

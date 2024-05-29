@@ -1,4 +1,8 @@
-use k8s_openapi::api::{apps::v1::Deployment, core::v1::Service, networking::v1::Ingress};
+use k8s_openapi::api::{
+  apps::v1::Deployment,
+  core::v1::{Secret, Service},
+  networking::v1::Ingress,
+};
 use kube::{
   api::{DeleteParams, PostParams},
   Api, Client, Result,
@@ -11,6 +15,7 @@ use crate::models::star::Star;
 use super::ResourceBind;
 
 pub struct StarRequestResolver {
+  secret: Api<Secret>,
   deploy: Api<Deployment>,
   svc: Api<Service>,
   ingress: Api<Ingress>,
@@ -22,10 +27,27 @@ impl StarRequestResolver {
     let galaxy_ns = format!("galaxy-{}", galaxy_id);
 
     Ok(Self {
+      secret: Api::namespaced(client.clone(), &galaxy_ns),
       deploy: Api::namespaced(client.clone(), &galaxy_ns),
       svc: Api::namespaced(client.clone(), &galaxy_ns),
       ingress: Api::namespaced(client, &galaxy_ns),
     })
+  }
+}
+
+impl From<&Star> for Secret {
+  fn from(star: &Star) -> Self {
+    let secret = json!({
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "metadata": {
+        "name": format!("star-{}-vars", star.id),
+        "namespace": format!("galaxy-{}", star.galaxy_id),
+      },
+      "stringData": {}
+    });
+
+    serde_json::from_value(secret).expect("Invalid secret")
   }
 }
 
@@ -74,14 +96,13 @@ impl From<&Star> for Deployment {
                   {
                     "name": "PORT",
                     "value": star.port.to_string()
-                  },
+                  }
+                ],
+                "envFrom": [
                   {
-                    "name": "POSTGRES_USER",
-                    "value": "postgres"
-                  },
-                  {
-                    "name": "POSTGRES_PASSWORD",
-                    "value": "postgres"
+                    "secretRef": {
+                      "name": format!("star-{}-vars", star.id)
+                    }
                   }
                 ],
                 "ports": [
@@ -195,6 +216,12 @@ impl ResourceBind for Star {
   type RequestResolver = StarRequestResolver;
 
   async fn create(&self, api: Self::RequestResolver) -> Result<()> {
+    // create env variables secret
+    let _ = api
+      .secret
+      .create(&Default::default(), &Secret::from(self))
+      .await?;
+
     let _ = api
       .deploy
       .create(&Default::default(), &Deployment::from(self))
@@ -254,11 +281,18 @@ impl ResourceBind for Star {
     let k8s_name = format!("star-{}", self.id.to_string());
     let dp = DeleteParams::default();
 
+    let _ = api
+      .secret
+      .delete(&format!("star-{}-vars", self.id), &dp)
+      .await?;
+
     let _ = api.deploy.delete(&k8s_name, &dp).await?;
 
     let _ = api.svc.delete(&k8s_name, &dp).await?;
 
-    let _ = api.ingress.delete(&k8s_name, &dp).await?;
+    if api.ingress.get_opt(&k8s_name).await?.is_some() {
+      let _ = api.ingress.delete(&k8s_name, &dp).await?;
+    }
 
     Ok(())
   }

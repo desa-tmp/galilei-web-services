@@ -32,6 +32,15 @@ CREATE TABLE IF NOT EXISTS stars (
   CONSTRAINT star_name_galaxy UNIQUE (name, galaxy_id) -- unique star name inside a galaxy
 );
 
+CREATE TABLE IF NOT EXISTS variables (
+  id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  value TEXT NOT NULL,
+  star_id UUID NOT NULL,
+  FOREIGN KEY (star_id) REFERENCES stars(id) ON DELETE CASCADE,
+  CONSTRAINT var_name_star UNIQUE (name, star_id) -- unique variable name for a star
+);
+
 CREATE TABLE IF NOT EXISTS planets (
   id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,

@@ -51,6 +51,15 @@ export interface paths {
     put: operations["update_star"];
     delete: operations["delete_star"];
   };
+  "/galaxies/{galaxy_id}/stars/{star_id}/vars": {
+    get: operations["get_all_star_vars"];
+    post: operations["create_star_var"];
+  };
+  "/galaxies/{galaxy_id}/stars/{star_id}/vars/{variable_id}": {
+    get: operations["get_star_var"];
+    put: operations["update_star_var"];
+    delete: operations["delete_star_var"];
+  };
   "/users/me": {
     get: operations["me"];
   };
@@ -84,6 +93,10 @@ export interface components {
       /** Format: int32 */
       port: number;
       public_domain: components["schemas"]["PublicDomain"];
+    };
+    CreateVariableData: {
+      name: string;
+      value: string;
     };
     Credentials: components["schemas"]["Password"] & {
       username: string;
@@ -155,10 +168,22 @@ export interface components {
       port?: number | null;
       public_domain?: components["schemas"]["PublicDomain"] | null;
     };
+    UpdateVariableData: {
+      name?: string | null;
+      value?: string | null;
+    };
     User: {
       /** Format: uuid */
       id: string;
       name: string;
+    };
+    Variable: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: uuid */
+      star_id: string;
+      value: string;
     };
   };
   responses: {
@@ -263,6 +288,12 @@ export interface components {
         "text/event-stream": components["schemas"]["StarStatus"];
       };
     };
+    /** @description specific star variable */
+    SpecificStarVariable: {
+      content: {
+        "application/json": components["schemas"]["Variable"];
+      };
+    };
     /** @description star successfully created */
     StarCreated: {
       content: {
@@ -279,6 +310,30 @@ export interface components {
     StarUpdated: {
       content: {
         "application/json": components["schemas"]["Star"];
+      };
+    };
+    /** @description star variable successfully created */
+    StarVariableCreated: {
+      content: {
+        "application/json": components["schemas"]["Variable"];
+      };
+    };
+    /** @description star variable successfully deleted */
+    StarVariableDeleted: {
+      content: {
+        "application/json": components["schemas"]["Variable"];
+      };
+    };
+    /** @description star variable successfully updated */
+    StarVariableUpdated: {
+      content: {
+        "application/json": components["schemas"]["Variable"];
+      };
+    };
+    /** @description all variables of a star */
+    StarVariablesList: {
+      content: {
+        "application/json": components["schemas"]["Variable"][];
       };
     };
     /** @description all stars in the galaxy */
@@ -607,6 +662,97 @@ export interface operations {
     };
     responses: {
       200: components["responses"]["StarDeleted"];
+      401: components["responses"]["UnauthorizeResponse"];
+      404: components["responses"]["NotFoundResponse"];
+      500: components["responses"]["InternalErrorResponse"];
+    };
+  };
+  get_all_star_vars: {
+    parameters: {
+      path: {
+        galaxy_id: string;
+        star_id: string;
+      };
+    };
+    responses: {
+      200: components["responses"]["StarVariablesList"];
+      401: components["responses"]["UnauthorizeResponse"];
+      404: components["responses"]["NotFoundResponse"];
+      500: components["responses"]["InternalErrorResponse"];
+    };
+  };
+  create_star_var: {
+    parameters: {
+      path: {
+        galaxy_id: string;
+        star_id: string;
+      };
+    };
+    /** @description data for creating the star */
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateVariableData"];
+      };
+    };
+    responses: {
+      200: components["responses"]["StarVariableCreated"];
+      400: components["responses"]["ValidationResponse"];
+      401: components["responses"]["UnauthorizeResponse"];
+      404: components["responses"]["NotFoundResponse"];
+      409: components["responses"]["AlreadyExistsResponse"];
+      500: components["responses"]["InternalErrorResponse"];
+    };
+  };
+  get_star_var: {
+    parameters: {
+      path: {
+        galaxy_id: string;
+        star_id: string;
+        variable_id: string;
+      };
+    };
+    responses: {
+      200: components["responses"]["SpecificStarVariable"];
+      400: components["responses"]["ValidationResponse"];
+      401: components["responses"]["UnauthorizeResponse"];
+      404: components["responses"]["NotFoundResponse"];
+      409: components["responses"]["AlreadyExistsResponse"];
+      500: components["responses"]["InternalErrorResponse"];
+    };
+  };
+  update_star_var: {
+    parameters: {
+      path: {
+        galaxy_id: string;
+        star_id: string;
+        variable_id: string;
+      };
+    };
+    /** @description data for updating the star */
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateStarData"];
+      };
+    };
+    responses: {
+      200: components["responses"]["StarVariableUpdated"];
+      400: components["responses"]["ValidationResponse"];
+      401: components["responses"]["UnauthorizeResponse"];
+      404: components["responses"]["NotFoundResponse"];
+      409: components["responses"]["AlreadyExistsResponse"];
+      500: components["responses"]["InternalErrorResponse"];
+    };
+  };
+  delete_star_var: {
+    parameters: {
+      path: {
+        galaxy_id: string;
+        star_id: string;
+        variable_id: string;
+      };
+    };
+    responses: {
+      200: components["responses"]["StarVariableDeleted"];
       401: components["responses"]["UnauthorizeResponse"];
       404: components["responses"]["NotFoundResponse"];
       500: components["responses"]["InternalErrorResponse"];

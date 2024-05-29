@@ -51,7 +51,7 @@ gen_update_data! {
 
 #[derive(Debug, From, Deserialize, IntoParams)]
 #[into_params(names("galaxy_id", "star_id"), parameter_in = Path)]
-pub struct StarPath(Uuid, Uuid);
+pub struct StarPath(pub Uuid, pub Uuid);
 
 #[async_trait]
 impl CrudOperations for Star {

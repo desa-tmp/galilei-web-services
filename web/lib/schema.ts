@@ -67,6 +67,24 @@ export type UpdateStarData = Omit<
 export const UpdateStarDataSchema =
   StarDataSchema.partial() satisfies ZodType<UpdateStarData>;
 
+export type StarVariable = components["schemas"]["Variable"];
+
+export type StarVariableData = components["schemas"]["CreateVariableData"];
+
+export const StarVariableDataSchema = z.object({
+  name: z.string().min(1, {
+    message: "Name required",
+  }),
+  value: z.string().min(1, {
+    message: "Value required",
+  }),
+}) satisfies ZodType<StarVariableData>;
+
+export type UpdateStarVariableData = components["schemas"]["UpdateVariableData"];
+
+export const UpdateStarVariableDataSchema =
+  StarVariableDataSchema.partial() satisfies ZodType<UpdateStarVariableData>;
+
 export type Planet = components["schemas"]["Planet"];
 
 export type PlanetData = Omit<
