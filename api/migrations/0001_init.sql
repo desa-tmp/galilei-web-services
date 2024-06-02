@@ -26,10 +26,12 @@ CREATE TABLE IF NOT EXISTS stars (
   name TEXT NOT NULL,
   nebula TEXT NOT NULL,
   public_domain TEXT UNIQUE,
+  private_domain TEXT,
   port INT NOT NULL,
   galaxy_id UUID NOT NULL,
   FOREIGN KEY (galaxy_id) REFERENCES galaxies(id) ON DELETE CASCADE,
-  CONSTRAINT star_name_galaxy UNIQUE (name, galaxy_id) -- unique star name inside a galaxy
+  CONSTRAINT star_name_galaxy UNIQUE (name, galaxy_id), -- unique star name inside a galaxy
+  CONSTRAINT private_domain_galaxy UNIQUE (private_domain, galaxy_id) -- unique private domain name inside a galaxy
 );
 
 CREATE TABLE IF NOT EXISTS variables (

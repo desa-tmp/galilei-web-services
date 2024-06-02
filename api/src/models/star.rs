@@ -19,13 +19,15 @@ pub struct Star {
   pub nebula: String,
   #[schema(min_length = 1)]
   pub public_domain: Option<String>,
+  #[schema(min_length = 1)]
+  pub private_domain: Option<String>,
   #[schema(minimum = 0, maximum = 65535)]
   pub port: i32,
   pub galaxy_id: Uuid,
 }
 
 #[derive(Debug, Deserialize, Validate, ToSchema)]
-pub struct PublicDomain {
+pub struct DomainName {
   #[schema(min_length = 1)]
   #[validate(length(min = 1, message = "cannot be empty"))]
   subdomain: Option<String>,
@@ -42,7 +44,9 @@ gen_update_data! {
     #[validate(length(min = 1, message = "cannot be empty"))]
     nebula: String,
     #[validate(nested)]
-    public_domain: PublicDomain,
+    public_domain: DomainName,
+    #[validate(nested)]
+    private_domain: DomainName,
     #[schema(minimum = 1, maximum = 65535)]
     #[validate(range(min = 1, max = 65535))]
     port: i32,
@@ -95,6 +99,7 @@ impl CrudOperations for Star {
       name,
       nebula,
       public_domain,
+      private_domain,
       port,
     } = data;
 
@@ -104,12 +109,14 @@ impl CrudOperations for Star {
         name,
         nebula,
         public_domain,
+        private_domain,
         port,
         galaxy_id
-      ) VALUES ($1, $2, $3, $4, $5) RETURNING *"#,
+      ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *"#,
       name,
       nebula,
       public_domain.subdomain,
+      private_domain.subdomain,
       port,
       galaxy_id
     )
@@ -128,11 +135,18 @@ impl CrudOperations for Star {
       name,
       nebula,
       public_domain,
+      private_domain,
       port,
     } = data;
 
     let update_public_domain = public_domain.is_some();
     let public_domain = public_domain
+      .as_ref()
+      .map(|dom| dom.subdomain.as_ref())
+      .unwrap_or(None);
+
+    let update_private_domain = private_domain.is_some();
+    let private_domain = private_domain
       .as_ref()
       .map(|dom| dom.subdomain.as_ref())
       .unwrap_or(None);
@@ -144,14 +158,17 @@ impl CrudOperations for Star {
       SET name = COALESCE($1, name),
         nebula = COALESCE($2, nebula),
         public_domain = (CASE WHEN $3 = true THEN $4 ELSE public_domain END),
-        port = COALESCE($5, port)
-      WHERE galaxy_id = $6 AND id = $7
+        private_domain = (CASE WHEN $5 = true THEN $6 ELSE private_domain END),
+        port = COALESCE($7, port)
+      WHERE galaxy_id = $8 AND id = $9
       RETURNING *
     "#,
       name.as_deref(),
       nebula.as_deref(),
       update_public_domain,
       public_domain,
+      update_private_domain,
+      private_domain,
       port.as_ref(),
       galaxy_id,
       star_id

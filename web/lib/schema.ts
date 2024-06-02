@@ -41,9 +41,10 @@ export type StarStatus = components["schemas"]["StarStatus"];
 
 export type StarData = Omit<
   components["schemas"]["CreateStarData"],
-  "public_domain"
+  "public_domain" | "private_domain"
 > & {
   public_domain: string;
+  private_domain: string;
 };
 
 export const StarDataSchema = z.object({
@@ -54,14 +55,16 @@ export const StarDataSchema = z.object({
     message: "Star nebula is required",
   }),
   public_domain: z.string(),
+  private_domain: z.string(),
   port: z.coerce.number({ message: "invalid port number" }).min(1).max(65535),
 }) satisfies ZodType<StarData>;
 
 export type UpdateStarData = Omit<
   components["schemas"]["UpdateStarData"],
-  "public_domain"
+  "public_domain" | "private_domain"
 > & {
   public_domain?: string;
+  private_domain?: string;
 };
 
 export const UpdateStarDataSchema =
@@ -80,7 +83,8 @@ export const StarVariableDataSchema = z.object({
   }),
 }) satisfies ZodType<StarVariableData>;
 
-export type UpdateStarVariableData = components["schemas"]["UpdateVariableData"];
+export type UpdateStarVariableData =
+  components["schemas"]["UpdateVariableData"];
 
 export const UpdateStarVariableDataSchema =
   StarVariableDataSchema.partial() satisfies ZodType<UpdateStarVariableData>;

@@ -25,11 +25,16 @@
       },
       {
         "ordinal": 4,
+        "name": "private_domain",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
         "name": "port",
         "type_info": "Int4"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "galaxy_id",
         "type_info": "Uuid"
       }
@@ -44,6 +49,7 @@
       false,
       false,
       false,
+      true,
       true,
       false,
       false

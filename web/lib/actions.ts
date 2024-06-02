@@ -103,7 +103,7 @@ export async function deleteGalaxy(galaxy_id: string) {
 export async function newStar(galaxyId: string, data: StarData) {
   const starData = StarDataSchema.parse(data);
 
-  const { public_domain, ...rest } = starData;
+  const { public_domain, private_domain, ...rest } = starData;
 
   const { error, data: star } = await api.POST("/galaxies/{galaxy_id}/stars", {
     params: {
@@ -113,6 +113,9 @@ export async function newStar(galaxyId: string, data: StarData) {
       ...rest,
       public_domain: {
         subdomain: public_domain.length === 0 ? null : public_domain,
+      },
+      private_domain: {
+        subdomain: private_domain.length === 0 ? null : private_domain,
       },
     },
   });
@@ -132,7 +135,7 @@ export async function updateStar(
 ) {
   const starData = UpdateStarDataSchema.parse(data);
 
-  const { public_domain, ...rest } = starData;
+  const { public_domain, private_domain, ...rest } = starData;
 
   const { error } = await api.PUT("/galaxies/{galaxy_id}/stars/{star_id}", {
     params: {
@@ -144,6 +147,12 @@ export async function updateStar(
         public_domain != undefined
           ? {
               subdomain: public_domain.length === 0 ? null : public_domain,
+            }
+          : null,
+      private_domain:
+        private_domain != undefined
+          ? {
+              subdomain: private_domain.length === 0 ? null : private_domain,
             }
           : null,
     },

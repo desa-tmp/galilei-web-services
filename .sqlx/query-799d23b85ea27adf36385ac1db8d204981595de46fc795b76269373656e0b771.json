@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO stars(\n        name,\n        nebula,\n        public_domain,\n        port,\n        galaxy_id\n      ) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+  "query": "UPDATE variables\n      SET name = COALESCE($1, name), value = COALESCE($2, value)\n      WHERE star_id = $3 AND id = $4\n      RETURNING *",
   "describe": {
     "columns": [
       {
@@ -15,22 +15,12 @@
       },
       {
         "ordinal": 2,
-        "name": "nebula",
+        "name": "value",
         "type_info": "Text"
       },
       {
         "ordinal": 3,
-        "name": "public_domain",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 4,
-        "name": "port",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 5,
-        "name": "galaxy_id",
+        "name": "star_id",
         "type_info": "Uuid"
       }
     ],
@@ -38,8 +28,7 @@
       "Left": [
         "Text",
         "Text",
-        "Text",
-        "Int4",
+        "Uuid",
         "Uuid"
       ]
     },
@@ -47,10 +36,8 @@
       false,
       false,
       false,
-      true,
-      false,
       false
     ]
   },
-  "hash": "0932b89658ee1d5609fb4ad9d6fe12dba02deab7b52485fbad5038ba07a1d81a"
+  "hash": "799d23b85ea27adf36385ac1db8d204981595de46fc795b76269373656e0b771"
 }

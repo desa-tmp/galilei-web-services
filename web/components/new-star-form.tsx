@@ -27,6 +27,7 @@ export default function NewStarForm({ galaxyId }: NewStarFormProps) {
       name: "",
       nebula: "",
       public_domain: "",
+      private_domain: "",
       port: 80,
     },
   });
@@ -70,6 +71,19 @@ export default function NewStarForm({ galaxyId }: NewStarFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Public Domain</FormLabel>
+              <FormControl>
+                <Input type="text" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="private_domain"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Private Domain</FormLabel>
               <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
               </FormControl>

@@ -61,7 +61,7 @@ impl Modify for SecurityAddon {
       models::galaxy::CreateGalaxyData,
       models::galaxy::UpdateGalaxyData,
       models::star::Star,
-      models::star::PublicDomain,
+      models::star::DomainName,
       models::star::CreateStarData,
       models::star::UpdateStarData,
       models::var::Variable,

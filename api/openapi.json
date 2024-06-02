@@ -1127,6 +1127,7 @@
           "name",
           "nebula",
           "public_domain",
+          "private_domain",
           "port"
         ],
         "properties": {
@@ -1144,8 +1145,11 @@
             "maximum": 65535,
             "minimum": 1
           },
+          "private_domain": {
+            "$ref": "#/components/schemas/DomainName"
+          },
           "public_domain": {
-            "$ref": "#/components/schemas/PublicDomain"
+            "$ref": "#/components/schemas/DomainName"
           }
         }
       },
@@ -1183,6 +1187,16 @@
             }
           }
         ]
+      },
+      "DomainName": {
+        "type": "object",
+        "properties": {
+          "subdomain": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
+          }
+        }
       },
       "ErrorMessage": {
         "type": "object",
@@ -1273,16 +1287,6 @@
           }
         }
       },
-      "PublicDomain": {
-        "type": "object",
-        "properties": {
-          "subdomain": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1
-          }
-        }
-      },
       "Star": {
         "type": "object",
         "required": [
@@ -1314,6 +1318,11 @@
             "format": "int32",
             "maximum": 65535,
             "minimum": 0
+          },
+          "private_domain": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
           },
           "public_domain": {
             "type": "string",
@@ -1414,10 +1423,18 @@
             "maximum": 65535,
             "minimum": 1
           },
+          "private_domain": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DomainName"
+              }
+            ],
+            "nullable": true
+          },
           "public_domain": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PublicDomain"
+                "$ref": "#/components/schemas/DomainName"
               }
             ],
             "nullable": true

@@ -92,7 +92,8 @@ export interface components {
       nebula: string;
       /** Format: int32 */
       port: number;
-      public_domain: components["schemas"]["PublicDomain"];
+      private_domain: components["schemas"]["DomainName"];
+      public_domain: components["schemas"]["DomainName"];
     };
     CreateVariableData: {
       name: string;
@@ -100,6 +101,9 @@ export interface components {
     };
     Credentials: components["schemas"]["Password"] & {
       username: string;
+    };
+    DomainName: {
+      subdomain?: string | null;
     };
     ErrorMessage: {
       message: string;
@@ -128,9 +132,6 @@ export interface components {
       /** Format: uuid */
       star_id?: string | null;
     };
-    PublicDomain: {
-      subdomain?: string | null;
-    };
     Star: {
       /** Format: uuid */
       galaxy_id: string;
@@ -141,6 +142,7 @@ export interface components {
       nebula: string;
       /** Format: int32 */
       port: number;
+      private_domain?: string | null;
       public_domain?: string | null;
     };
     StarStatus: OneOf<[{
@@ -166,7 +168,8 @@ export interface components {
       nebula?: string | null;
       /** Format: int32 */
       port?: number | null;
-      public_domain?: components["schemas"]["PublicDomain"] | null;
+      private_domain?: components["schemas"]["DomainName"] | null;
+      public_domain?: components["schemas"]["DomainName"] | null;
     };
     UpdateVariableData: {
       name?: string | null;

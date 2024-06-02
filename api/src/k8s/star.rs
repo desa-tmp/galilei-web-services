@@ -1,10 +1,10 @@
 use k8s_openapi::api::{
   apps::v1::Deployment,
-  core::v1::{Secret, Service},
+  core::v1::{ConfigMap, Secret, Service},
   networking::v1::Ingress,
 };
 use kube::{
-  api::{DeleteParams, PostParams},
+  api::{DeleteParams, Patch, PatchParams, PostParams},
   Api, Client, Result,
 };
 use serde_json::json;
@@ -19,6 +19,7 @@ pub struct StarRequestResolver {
   deploy: Api<Deployment>,
   svc: Api<Service>,
   ingress: Api<Ingress>,
+  coredns_custom: Api<ConfigMap>,
 }
 
 impl StarRequestResolver {
@@ -30,7 +31,8 @@ impl StarRequestResolver {
       secret: Api::namespaced(client.clone(), &galaxy_ns),
       deploy: Api::namespaced(client.clone(), &galaxy_ns),
       svc: Api::namespaced(client.clone(), &galaxy_ns),
-      ingress: Api::namespaced(client, &galaxy_ns),
+      ingress: Api::namespaced(client.clone(), &galaxy_ns),
+      coredns_custom: Api::namespaced(client, "kube-system"),
     })
   }
 }
@@ -80,6 +82,7 @@ impl From<&Star> for Deployment {
             "labels": {
               "star_name": star.name,
               "star_id": star.id,
+              "galaxy_id": star.galaxy_id
             },
           },
           "spec": {
@@ -149,6 +152,37 @@ impl From<&Star> for Service {
     });
 
     serde_json::from_value(svc).expect("Invalid service")
+  }
+}
+
+impl From<&Star> for ConfigMap {
+  fn from(star: &Star) -> Self {
+    let private_domain = star
+      .private_domain
+      .as_ref()
+      .expect("Private domain not found when creating coredns config map");
+
+    let custom_dns = json!({
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "coredns-custom",
+        "namespace": "kube-system"
+      },
+      "data": {
+        format!("star-{}.override", star.id): format!(
+          r#"template IN ANY {}.gws.internal {{
+              match "^{}\.gws\.internal\.$"
+              answer "{{{{ .Name }}}} 60 IN CNAME star-{}.{{{{ .Meta \"kubernetes/client-namespace\" }}}}.svc.cluster.local"
+            }}"#,
+          private_domain,
+          private_domain,
+          star.id,
+        )
+      }
+    });
+
+    serde_json::from_value(custom_dns).expect("Invalid coredns configmap")
   }
 }
 
@@ -239,6 +273,17 @@ impl ResourceBind for Star {
         .await?;
     }
 
+    if self.private_domain.is_some() {
+      let _ = api
+        .coredns_custom
+        .patch(
+          "coredns-custom",
+          &PatchParams::apply("gws-api"),
+          &Patch::Apply(ConfigMap::from(self)),
+        )
+        .await?;
+    }
+
     Ok(())
   }
 
@@ -274,6 +319,24 @@ impl ResourceBind for Star {
       }
     }
 
+    let pp = PatchParams::apply("gws-api");
+    let patch = Patch::Apply(if self.private_domain.is_some() {
+      ConfigMap::from(self)
+    } else {
+      let mut coredns_custom = api.coredns_custom.get("coredns-custom").await?;
+
+      if let Some(data) = coredns_custom.data.as_mut() {
+        let _ = data.remove(&format!("star-{}.override", self.id));
+      }
+
+      coredns_custom
+    });
+
+    let _ = api
+      .coredns_custom
+      .patch("coredns-custom", &pp, &patch)
+      .await?;
+
     Ok(())
   }
 
@@ -293,6 +356,17 @@ impl ResourceBind for Star {
     if api.ingress.get_opt(&k8s_name).await?.is_some() {
       let _ = api.ingress.delete(&k8s_name, &dp).await?;
     }
+
+    let mut coredns_custom = api.coredns_custom.get("coredns-custom").await?;
+
+    if let Some(data) = coredns_custom.data.as_mut() {
+      let _ = data.remove(&format!("star-{}.override", self.id));
+    }
+
+    let _ = api
+      .coredns_custom
+      .replace("coredns-custom", &Default::default(), &coredns_custom)
+      .await?;
 
     Ok(())
   }
