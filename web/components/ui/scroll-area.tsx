@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils";
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
+    overflowMarker?: boolean;
+  }
+>(({ className, children, overflowMarker = false, ...props }, ref) => {
   const [overflowOn, setOverflowOn] = React.useState<
     "top" | "bottom" | "both" | null
   >(null);
@@ -32,9 +34,9 @@ const ScrollArea = React.forwardRef<
       ref={ref}
       className={cn(
         "relative overflow-hidden border-y-2 border-transparent transition-colors",
-        overflowOn === "top" && "border-t-border",
-        overflowOn === "both" && "border-y-border",
-        overflowOn === "bottom" && "border-b-border",
+        overflowMarker && overflowOn === "top" && "border-t-border",
+        overflowMarker && overflowOn === "both" && "border-y-border",
+        overflowMarker && overflowOn === "bottom" && "border-b-border",
         className
       )}
       {...props}
