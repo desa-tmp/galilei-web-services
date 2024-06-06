@@ -19,6 +19,7 @@ import { Earth, Plus, Star as StarIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Star } from "@/lib/schema";
+import { ScrollArea } from "./ui/scroll-area";
 
 export interface NewResourceBtnProps {
   galaxyId: string;
@@ -70,14 +71,16 @@ export default function NewResourceBtn({
         </DropdownMenuContent>
       </DropdownMenu>
       {dialogType === "star" ? (
-        <DialogContent>
+        <DialogContent className="h-5/6 w-11/12 rounded-lg pr-2">
           <DialogHeader>
             <DialogTitle>New Star</DialogTitle>
           </DialogHeader>
-          <NewStarForm galaxyId={galaxyId} />
+          <ScrollArea type="auto" overflowMarker>
+            <NewStarForm galaxyId={galaxyId} />
+          </ScrollArea>
         </DialogContent>
       ) : (
-        <DialogContent>
+        <DialogContent className="h-5/6 w-11/12 rounded-lg pr-2">
           <DialogHeader>
             <DialogTitle>New Planet</DialogTitle>
           </DialogHeader>

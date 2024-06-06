@@ -32,18 +32,17 @@ const ScrollArea = React.forwardRef<
   return (
     <ScrollAreaPrimitive.Root
       ref={ref}
-      className={cn(
-        "relative overflow-hidden border-y-2 border-transparent transition-colors",
-        overflowMarker && overflowOn === "top" && "border-t-border",
-        overflowMarker && overflowOn === "both" && "border-y-border",
-        overflowMarker && overflowOn === "bottom" && "border-b-border",
-        className
-      )}
+      className={cn("relative overflow-hidden", className)}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
-        className="size-full rounded-[inherit]"
-        onScroll={onScroll}
+        className={cn(
+          "size-full rounded-[inherit] border-y-2 border-transparent transition-colors",
+          overflowMarker && overflowOn === "top" && "border-t-border",
+          overflowMarker && overflowOn === "both" && "border-y-border",
+          overflowMarker && overflowOn === "bottom" && "border-b-border"
+        )}
+        onScroll={overflowMarker ? onScroll : undefined}
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
