@@ -18,9 +18,13 @@ import { DialogFooter } from "./ui/dialog";
 
 export interface NewStarFormProps {
   galaxyId: string;
+  afterSubmit?: () => void;
 }
 
-export default function NewStarForm({ galaxyId }: NewStarFormProps) {
+export default function NewStarForm({
+  galaxyId,
+  afterSubmit,
+}: NewStarFormProps) {
   const form = useForm<StarData>({
     resolver: zodResolver(StarDataSchema),
     defaultValues: {
@@ -34,11 +38,12 @@ export default function NewStarForm({ galaxyId }: NewStarFormProps) {
 
   async function onSubmit(data: StarData) {
     await newStar(galaxyId, data);
+    afterSubmit?.();
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pr-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4">
         <FormField
           control={form.control}
           name="name"

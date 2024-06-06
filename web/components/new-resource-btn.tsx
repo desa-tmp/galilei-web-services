@@ -33,6 +33,7 @@ export default function NewResourceBtn({
   stars,
 }: NewResourceBtnProps) {
   const [dialogType, setDialogType] = useState<DialogType>("star");
+  const [isOpen, setIsOpen] = useState(false);
 
   function changeDialogType(type: DialogType) {
     return function () {
@@ -41,7 +42,7 @@ export default function NewResourceBtn({
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button className="flex items-center gap-2">
@@ -71,20 +72,27 @@ export default function NewResourceBtn({
         </DropdownMenuContent>
       </DropdownMenu>
       {dialogType === "star" ? (
-        <DialogContent className="h-5/6 w-11/12 rounded-lg pr-2">
-          <DialogHeader>
+        <DialogContent className="h-5/6 w-11/12 rounded-lg px-2">
+          <DialogHeader className="px-4">
             <DialogTitle>New Star</DialogTitle>
           </DialogHeader>
           <ScrollArea type="auto" overflowMarker>
-            <NewStarForm galaxyId={galaxyId} />
+            <NewStarForm
+              galaxyId={galaxyId}
+              afterSubmit={() => setIsOpen(false)}
+            />
           </ScrollArea>
         </DialogContent>
       ) : (
-        <DialogContent className="h-5/6 w-11/12 rounded-lg pr-2">
-          <DialogHeader>
+        <DialogContent className="h-5/6 w-11/12 rounded-lg px-2">
+          <DialogHeader className="px-4">
             <DialogTitle>New Planet</DialogTitle>
           </DialogHeader>
-          <NewPlanetForm galaxyId={galaxyId} stars={stars} />
+          <NewPlanetForm
+            galaxyId={galaxyId}
+            stars={stars}
+            afterSubmit={() => setIsOpen(false)}
+          />
         </DialogContent>
       )}
     </Dialog>
